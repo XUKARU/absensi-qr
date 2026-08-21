@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Absensi Karyawan</title>
+
+  <script src="https://unpkg.com/html5-qrcode"
+          type="text/javascript">
+  </script>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    #reader {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    #hasil {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>📷 ABSENSI KARYAWAN</h2>
+
+  <div id="reader"></div>
+
+  <div id="hasil">
+    Arahkan kamera HP ke QR Code karyawan.
+  </div>
+
+</div>
+
+
+<script>
+
+let sudahScan = false;
+
+
+function berhasilScan(qrText) {
+
+  if (sudahScan) {
+    return;
+  }
+
+  sudahScan = true;
+
+  document.getElementById("hasil").innerHTML =
+    "✅ QR TERBACA<br>" +
+    "Mengambil lokasi GPS...";
+
+
+  // =========================
+  // AMBIL GPS
+  // =========================
+
+  if (!navigator.geolocation) {
+
+    document.getElementById("hasil").innerHTML =
+      "❌ GPS tidak tersedia.";
+
+    sudahScan = false;
+
+    return;
+  }
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position) {
+
+      const latitude =
+        position.coords.latitude;
+
+      const longitude =
+        position.coords.longitude;
+
+
+      document.getElementById("hasil").innerHTML =
+        "✅ QR TERBACA<br>" +
+        "📍 GPS berhasil diambil<br><br>" +
+        "Latitude: " + latitude +
+        "<br>" +
+        "Longitude: " + longitude;
+
+    },
+
+
+    function(error) {
+
+      document.getElementById("hasil").innerHTML =
+        "❌ GPS tidak dapat digunakan.<br>" +
+        "Silakan izinkan akses lokasi.";
+
+      sudahScan = false;
+
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+
+  );
+
+}
+
+
+const scanner =
+  new Html5QrcodeScanner(
+    "reader",
+    {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+    },
+    false
+  );
+
+
+scanner.render(
+  berhasilScan,
+  function(error) {
+    // Abaikan error scan
+  }
+);
+
+</script>
+
+</body>
+</html>
