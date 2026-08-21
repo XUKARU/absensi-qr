@@ -497,169 +497,78 @@ function tampilkanMember() {
 
 
 // ==================================================
-// MULAI SCANNER
+// MULAI SCANNER - KAMERA BELAKANG
 // ==================================================
 
 async function mulaiScanner() {
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
-
+    document.getElementById("hasil");
 
   try {
 
-
-    hasil.className =
-      "normal";
-
+    hasil.className = "normal";
 
     hasil.innerHTML =
-      "📷 Meminta izin kamera...";
+      "📷 Membuka kamera belakang...";
 
 
-    // MINTA IZIN KAMERA
-
-    await navigator.mediaDevices
-      .getUserMedia({
-
-        video: {
-
-          facingMode: {
-            ideal: "environment"
-          }
-
-        },
-
-        audio: false
-
-      });
-
-
-    // CARI KAMERA
-
-    const cameras =
-      await Html5Qrcode
-        .getCameras();
-
-
-    if (
-      !cameras ||
-      cameras.length === 0
-    ) {
-
-      throw new Error(
-        "Kamera tidak ditemukan."
-      );
-
-    }
-
-
-    // CARI KAMERA BELAKANG
-
-    let kameraBelakang =
-      cameras.find(
-        function(camera) {
-
-          const nama =
-            String(
-              camera.label
-            ).toLowerCase();
-
-
-          return (
-
-            nama.includes("back") ||
-
-            nama.includes("rear") ||
-
-            nama.includes("environment") ||
-
-            nama.includes("belakang")
-
-          );
-
-        }
-      );
-
-
-    // JIKA TIDAK DITEMUKAN
-
-    if (!kameraBelakang) {
-
-      kameraBelakang =
-        cameras[
-          cameras.length - 1
-        ];
-
-    }
-
-
-    console.log(
-      "Kamera:",
-      kameraBelakang.label
-    );
-
-
+    // Buat scanner
     scanner =
-      new Html5Qrcode(
-        "reader"
-      );
+      new Html5Qrcode("reader");
 
+
+    // Konfigurasi QR
+    const config = {
+
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+
+      aspectRatio: 1.0,
+
+      disableFlip: false
+
+    };
+
+
+    // ==========================================
+    // LANGSUNG PAKAI KAMERA BELAKANG
+    // ==========================================
 
     await scanner.start(
 
-      kameraBelakang.id,
-
       {
-
-        fps: 10,
-
-        qrbox: {
-
-          width: 250,
-
-          height: 250
-
-        },
-
-        aspectRatio: 1.0,
-
-        disableFlip: false
-
+        facingMode: "environment"
       },
+
+      config,
 
       onScanSuccess,
 
-      function(error) {}
+      function(errorMessage) {
+        // Abaikan error scan sementara
+      }
 
     );
 
 
-    hasil.className =
-      "normal";
-
+    hasil.className = "normal";
 
     hasil.innerHTML =
       "📷 <b>Kamera belakang aktif</b>" +
-      "<br>" +
-      "Arahkan ke QR perusahaan.";
+      "<br><br>" +
+      "Arahkan kamera ke QR perusahaan.";
 
 
-  }
+  } catch (error) {
 
-  catch(error) {
+    console.error(error);
 
-
-    console.error(
-      error
-    );
-
-
-    hasil.className =
-      "error";
-
+    hasil.className = "error";
 
     hasil.innerHTML =
       "❌ Kamera tidak dapat digunakan." +
@@ -669,7 +578,6 @@ async function mulaiScanner() {
   }
 
 }
-
 
 // ==================================================
 // QR TERBACA
