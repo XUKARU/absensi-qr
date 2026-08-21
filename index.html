@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
 
@@ -8,42 +9,69 @@
 
   <title>Absensi Karyawan</title>
 
-  <script src="https://unpkg.com/html5-qrcode"
-          type="text/javascript">
-  </script>
-
   <style>
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-      margin: 0;
-      padding: 20px;
+    * {
+      box-sizing: border-box;
     }
 
-    .container {
-      max-width: 450px;
-      margin: auto;
-      background: white;
+    body {
+      margin: 0;
       padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+    }
+
+    .box {
+      max-width: 450px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
       border-radius: 15px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
     }
 
     h2 {
-      text-align: center;
+      margin-top: 0;
     }
 
-    #reader {
+    video {
       width: 100%;
-      margin-top: 20px;
+      border-radius: 12px;
+      background: black;
+      margin-top: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #1a73e8;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
     }
 
     #hasil {
       margin-top: 20px;
-      text-align: center;
+      font-size: 17px;
       font-weight: bold;
       line-height: 1.6;
+    }
+
+    .success {
+      color: #188038;
+    }
+
+    .error {
+      color: #d93025;
     }
 
   </style>
@@ -52,14 +80,27 @@
 
 <body>
 
-<div class="container">
+<div class="box">
 
   <h2>📷 ABSENSI KARYAWAN</h2>
 
-  <div id="reader"></div>
+  <video
+    id="video"
+    autoplay
+    playsinline>
+  </video>
+
+  <button id="btnKamera"
+          onclick="mulaiKamera()">
+
+    MULAI KAMERA
+
+  </button>
 
   <div id="hasil">
-    Arahkan kamera HP ke QR Code karyawan.
+
+    Tekan MULAI KAMERA
+
   </div>
 
 </div>
@@ -67,101 +108,91 @@
 
 <script>
 
-let sudahScan = false;
+let stream = null;
+let scanning = false;
+
+const TOKEN_PERUSAHAAN =
+  "COMPANY-ABSEN-2026";
 
 
-function berhasilScan(qrText) {
+// ========================================
+// MULAI KAMERA
+// ========================================
 
-  if (sudahScan) {
-    return;
+async function mulaiKamera() {
+
+  const hasil =
+    document.getElementById("hasil");
+
+  const tombol =
+    document.getElementById("btnKamera");
+
+
+  try {
+
+    stream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video: {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
+
+        audio: false
+
+      });
+
+
+    const video =
+      document.getElementById("video");
+
+
+    video.srcObject =
+      stream;
+
+
+    scanning =
+      true;
+
+
+    tombol.disabled =
+      true;
+
+
+    hasil.innerHTML =
+      "📷 Kamera aktif.<br>" +
+      "Arahkan kamera ke QR perusahaan.";
+
+
+    // Untuk tahap pertama kita
+    // belum membaca QR dulu.
+
   }
 
-  sudahScan = true;
+  catch (error) {
 
-  document.getElementById("hasil").innerHTML =
-    "✅ QR TERBACA<br>" +
-    "Mengambil lokasi GPS...";
+    console.error(error);
 
 
-  // =========================
-  // AMBIL GPS
-  // =========================
+    hasil.className =
+      "error";
 
-  if (!navigator.geolocation) {
 
-    document.getElementById("hasil").innerHTML =
-      "❌ GPS tidak tersedia.";
+    hasil.innerHTML =
+      "❌ Kamera tidak dapat digunakan.<br>" +
+      error.message;
 
-    sudahScan = false;
 
-    return;
+    tombol.disabled =
+      false;
+
   }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const latitude =
-        position.coords.latitude;
-
-      const longitude =
-        position.coords.longitude;
-
-
-      document.getElementById("hasil").innerHTML =
-        "✅ QR TERBACA<br>" +
-        "📍 GPS berhasil diambil<br><br>" +
-        "Latitude: " + latitude +
-        "<br>" +
-        "Longitude: " + longitude;
-
-    },
-
-
-    function(error) {
-
-      document.getElementById("hasil").innerHTML =
-        "❌ GPS tidak dapat digunakan.<br>" +
-        "Silakan izinkan akses lokasi.";
-
-      sudahScan = false;
-
-    },
-
-    {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    }
-
-  );
 
 }
-
-
-const scanner =
-  new Html5QrcodeScanner(
-    "reader",
-    {
-      fps: 10,
-      qrbox: {
-        width: 250,
-        height: 250
-      }
-    },
-    false
-  );
-
-
-scanner.render(
-  berhasilScan,
-  function(error) {
-    // Abaikan error scan
-  }
-);
 
 </script>
 
 </body>
+
 </html>
