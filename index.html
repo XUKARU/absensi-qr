@@ -681,7 +681,25 @@ function onScanSuccess(
     localStorage.getItem(
       "memberNama"
     );
+setTimeout(
+  function() {
 
+    if (scanner) {
+
+      scanner.stop()
+        .catch(function(error) {
+
+          console.log(error);
+
+        });
+
+    }
+
+    ambilGPSDanAbsen();
+
+  },
+  500
+);
 
   // Hentikan scanner
 
@@ -711,20 +729,254 @@ function onScanSuccess(
 
 
   // ==========================================
-  // TAHAP SELANJUTNYA
-  // ==========================================
+// AMBIL GPS
+// ==========================================
 
-  console.log(
-    "Member Token:",
-    memberToken
+function ambilGPSDanAbsen() {
+
+  const hasil =
+    document.getElementById("hasil");
+
+  hasil.className =
+    "normal";
+
+  hasil.innerHTML =
+    "📍 Mengambil lokasi GPS...";
+
+
+  if (!navigator.geolocation) {
+
+    hasil.className =
+      "error";
+
+    hasil.innerHTML =
+      "❌ Browser tidak mendukung GPS.";
+
+    return;
+
+  }
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position) {
+
+      const latitude =
+        position.coords.latitude;
+
+      const longitude =
+        position.coords.longitude;
+
+
+      hasil.innerHTML =
+        "📍 GPS berhasil." +
+        "<br>" +
+        "⏳ Menyimpan absensi...";
+
+
+      // ==========================================
+      // KIRIM KE APPS SCRIPT
+      // ==========================================
+
+      google.script.run
+
+        .withSuccessHandler(
+          function(result) {
+
+            if (
+              result.sukses
+            ) {
+
+              hasil.className =
+                "success";
+
+
+              if (
+                result.tipe ===
+                "MASUK"
+              ) {
+
+                hasil.innerHTML =
+
+                  "✅ <b>ABSEN MASUK BERHASIL</b>" +
+
+                  "<br><br>" +
+
+                  "Nama: " +
+                  result.nama +
+
+                  "<br>" +
+
+                  "Waktu: " +
+                  result.waktu;
+
+              }
+
+
+              else if (
+                result.tipe ===
+                "KELUAR"
+              ) {
+
+                hasil.innerHTML =
+
+                  "✅ <b>ABSEN KELUAR BERHASIL</b>" +
+
+                  "<br><br>" +
+
+                  "Nama: " +
+                  result.nama +
+
+                  "<br>" +
+
+                  "Waktu: " +
+                  result.waktu +
+
+                  "<br>" +
+
+                  "Total: " +
+                  result.totalJam +
+
+                  "<br>" +
+
+                  "Status: " +
+                  result.status;
+
+              }
+
+
+              // ====================================
+              // RESET UNTUK SCAN BERIKUTNYA
+              // ====================================
+
+              setTimeout(
+                function() {
+
+                  location.reload();
+
+                },
+                5000
+              );
+
+
+            } else {
+
+
+              hasil.className =
+                "error";
+
+
+              hasil.innerHTML =
+                "❌ " +
+                result.pesan;
+
+
+              sudahScan =
+                false;
+
+            }
+
+          }
+        )
+
+
+        .withFailureHandler(
+          function(error) {
+
+            console.error(
+              error
+            );
+
+
+            hasil.className =
+              "error";
+
+
+            hasil.innerHTML =
+              "❌ Gagal menyimpan absensi.";
+
+
+            sudahScan =
+              false;
+
+          }
+        )
+
+
+        .prosesAbsensiMember(
+
+          memberToken,
+
+          latitude,
+
+          longitude
+
+        );
+
+    },
+
+
+    function(error) {
+
+      hasil.className =
+        "error";
+
+
+      if (
+        error.code === 1
+      ) {
+
+        hasil.innerHTML =
+          "❌ Izin lokasi ditolak.<br>" +
+          "Silakan izinkan GPS pada browser.";
+
+      }
+
+      else if (
+        error.code === 2
+      ) {
+
+        hasil.innerHTML =
+          "❌ Lokasi tidak tersedia.";
+
+      }
+
+      else if (
+        error.code === 3
+      ) {
+
+        hasil.innerHTML =
+          "❌ Pengambilan lokasi terlalu lama.";
+
+      }
+
+      else {
+
+        hasil.innerHTML =
+          "❌ GPS tidak dapat diperoleh.";
+
+      }
+
+
+      sudahScan =
+        false;
+
+    },
+
+
+    {
+
+      enableHighAccuracy:
+        true,
+
+      timeout:
+        15000,
+
+      maximumAge:
+        0
+
+    }
+
   );
 
 }
-
-
-</script>
-
-
-</body>
-
-</html>
