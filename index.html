@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-f
+
   <meta charset="UTF-8">
 
   <meta name="viewport"
@@ -10,10 +10,8 @@ f
 
   <title>Absensi Karyawan</title>
 
-  <!-- LIBRARY QR SCANNER -->
   <script src="https://unpkg.com/html5-qrcode"
           type="text/javascript"></script>
-
 
   <style>
 
@@ -24,28 +22,18 @@ f
     body {
       margin: 0;
       padding: 20px;
-
       font-family: Arial, sans-serif;
-
       background: #f2f4f7;
     }
 
     .container {
-
       width: 100%;
       max-width: 450px;
-
       margin: 20px auto;
-
       padding: 20px;
-
       background: white;
-
       border-radius: 15px;
-
-      box-shadow:
-        0 4px 15px rgba(0,0,0,0.12);
-
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
       text-align: center;
     }
 
@@ -55,54 +43,39 @@ f
     }
 
     #reader {
-
       width: 100%;
       max-width: 400px;
-
       margin: auto;
     }
 
     #hasil {
-
       margin-top: 20px;
-
       padding: 12px;
-
       border-radius: 8px;
-
       font-size: 16px;
-
       font-weight: bold;
-
       line-height: 1.6;
     }
 
     .normal {
-
       background: #f1f3f4;
       color: #333;
     }
 
     .success {
-
       background: #e6f4ea;
       color: #188038;
     }
 
     .error {
-
       background: #fce8e6;
       color: #d93025;
     }
 
     .info {
-
       margin-top: 15px;
-
       font-size: 14px;
-
       color: #666;
-
       line-height: 1.5;
     }
 
@@ -120,9 +93,7 @@ f
     📷 ABSENSI KARYAWAN
   </h2>
 
-
   <div id="reader"></div>
-
 
   <div id="hasil"
        class="normal">
@@ -130,7 +101,6 @@ f
     Mencari kamera belakang...
 
   </div>
-
 
   <div class="info">
 
@@ -149,153 +119,113 @@ f
 
 <script>
 
-
-// ==================================================
-// TOKEN QR PERUSAHAAN
-// ==================================================
-
 const TOKEN_PERUSAHAAN =
   "COMPANY-ABSEN";
 
-
-let sudahBerhasil = false;
-
 let scanner = null;
 
-let cameraStream = null;
+let sudahScan = false;
 
 
 // ==================================================
-// ELEMENT HASIL
+// HASIL SCAN
 // ==================================================
 
-const hasil =
-  document.getElementById("hasil");
+function onScanSuccess(decodedText) {
 
-
-// ==================================================
-// QR BERHASIL DIBACA
-// ==================================================
-
-  hasil.className =
-  "success";
-
-hasil.innerHTML =
-  "✅ <b>QR PERUSAHAAN VALID</b>" +
-  "<br><br>" +
-  "Token: " +
-  token;
-
-matikanKamera();
-
-  // Bersihkan video
-  const video =
-    document.querySelector(
-      "#reader video"
-    );
-
-  if (video) {
-
-    video.srcObject = null;
-
-  }
-
-}
-function onScanSuccess(
-  decodedText,
-  decodedResult
-) {
-
-  console.log(
-    "QR terbaca:",
-    decodedText
-  );
-
-
-  if (sudahBerhasil) {
-
+  if (sudahScan) {
     return;
-
   }
-
 
   const token =
     String(decodedText).trim();
 
 
+  console.log(
+    "QR terbaca:",
+    token
+  );
+
+
   // ==================================================
-  // VALIDASI QR PERUSAHAAN
+  // QR VALID
   // ==================================================
 
   if (
-    token ===
-    TOKEN_PERUSAHAAN
+    token === TOKEN_PERUSAHAAN
   ) {
 
-    sudahBerhasil =
-      true;
+    sudahScan = true;
+
+
+    const hasil =
+      document.getElementById("hasil");
 
 
     hasil.className =
-  "success";
-
-hasil.innerHTML =
-  "✅ <b>QR PERUSAHAAN VALID</b>" +
-  "<br><br>" +
-  "Token: " +
-  token;
-
-    console.log(
-      "QR perusahaan valid."
-    );
+      "success";
 
 
-    // Hentikan kamera
+    hasil.innerHTML =
+      "✅ <b>QR PERUSAHAAN VALID</b>" +
+      "<br><br>" +
+      "Token: " +
+      token;
+
+
+    // Hentikan scanner
     if (scanner) {
 
-  scanner.stop()
-    .then(function() {
+      scanner.stop()
+        .then(function() {
 
-      console.log("Kamera berhasil dihentikan.");
+          console.log(
+            "Scanner berhasil dihentikan."
+          );
 
-      return scanner.clear();
+          return scanner.clear();
 
-    })
-    .catch(function(error) {
+        })
+        .catch(function(error) {
 
-      console.log(
-        "Gagal menghentikan kamera:",
-        error
-      );
+          console.log(
+            "Scanner sudah berhenti:",
+            error
+          );
 
-    });
+        });
 
-}
+    }
+
 
   } else {
+
+
+    const hasil =
+      document.getElementById("hasil");
+
 
     hasil.className =
       "error";
 
 
     hasil.innerHTML =
-
       "❌ <b>QR TIDAK VALID</b>" +
-
       "<br><br>" +
-
-      "Isi QR:" +
-
-      "<br>" +
-
+      "Isi QR: " +
       token;
 
 
-    console.log(
-      "QR bukan QR perusahaan:",
-      token
-    );
+    // Bisa scan lagi
+    setTimeout(function() {
 
+      hasil.className =
+        "normal";
+
+      hasil.innerHTML =
+        "Arahkan kamera ke QR perusahaan.";
+
+    }, 2000);
 
   }
 
@@ -303,25 +233,27 @@ hasil.innerHTML =
 
 
 // ==================================================
-// QR BELUM TERBACA
+// ERROR SCAN
 // ==================================================
 
-function onScanFailure(
-  errorMessage
-) {
+function onScanFailure(errorMessage) {
 
-  // Tidak menampilkan error.
-  // Fungsi ini dipanggil terus
-  // selama scanner mencari QR.
+  // Tidak ditampilkan
+  // karena fungsi ini berjalan terus
+  // selama kamera mencari QR.
 
 }
 
 
 // ==================================================
-// CARI KAMERA BELAKANG
+// MULAI SCANNER
 // ==================================================
 
 async function mulaiScanner() {
+
+  const hasil =
+    document.getElementById("hasil");
+
 
   try {
 
@@ -333,26 +265,22 @@ async function mulaiScanner() {
 
 
     // ==================================================
-    // MINTA IZIN KAMERA
+    // MINTA IZIN KAMERA SEKALI
     // ==================================================
 
-    cameraStream =
-  await navigator.mediaDevices
-    .getUserMedia({
+    await navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: false
+      });
 
-      video: true,
-
-      audio: false
-
-    });
 
     // ==================================================
-    // AMBIL DAFTAR KAMERA
+    // CARI KAMERA
     // ==================================================
 
     const cameras =
-      await Html5Qrcode
-        .getCameras();
+      await Html5Qrcode.getCameras();
 
 
     if (
@@ -368,7 +296,7 @@ async function mulaiScanner() {
 
 
     console.log(
-      "Daftar kamera:",
+      "Kamera tersedia:",
       cameras
     );
 
@@ -381,7 +309,9 @@ async function mulaiScanner() {
       cameras.find(function(camera) {
 
         const nama =
-          camera.label.toLowerCase();
+          String(camera.label)
+            .toLowerCase();
+
 
         return (
 
@@ -399,8 +329,7 @@ async function mulaiScanner() {
 
 
     // ==================================================
-    // JIKA KAMERA BELAKANG
-    // TIDAK DITEMUKAN
+    // JIKA LABEL TIDAK TERSEDIA
     // GUNAKAN KAMERA TERAKHIR
     // ==================================================
 
@@ -413,7 +342,7 @@ async function mulaiScanner() {
 
 
     console.log(
-      "Kamera yang digunakan:",
+      "Kamera dipilih:",
       kameraBelakang.label
     );
 
@@ -426,14 +355,8 @@ async function mulaiScanner() {
       new Html5Qrcode("reader");
 
 
-    hasil.innerHTML =
-      "📷 Kamera belakang aktif." +
-      "<br>" +
-      "Arahkan ke QR perusahaan.";
-
-
     // ==================================================
-    // MULAI KAMERA BELAKANG
+    // MULAI SCANNER
     // ==================================================
 
     await scanner.start(
@@ -462,7 +385,19 @@ async function mulaiScanner() {
     );
 
 
-  } catch (error) {
+    hasil.className =
+      "normal";
+
+
+    hasil.innerHTML =
+      "📷 <b>Kamera belakang aktif</b>" +
+      "<br>" +
+      "Arahkan kamera ke QR perusahaan.";
+
+
+  }
+
+  catch (error) {
 
     console.error(
       error
@@ -474,11 +409,8 @@ async function mulaiScanner() {
 
 
     hasil.innerHTML =
-
       "❌ Kamera tidak dapat digunakan." +
-
       "<br><br>" +
-
       error.message;
 
   }
@@ -487,7 +419,7 @@ async function mulaiScanner() {
 
 
 // ==================================================
-// MULAI SAAT HALAMAN DIBUKA
+// JALANKAN SAAT HALAMAN DIBUKA
 // ==================================================
 
 window.addEventListener(
