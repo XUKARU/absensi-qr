@@ -1,1068 +1,126 @@
-<!DOCTYPE html>
-<html lang="id">
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbx6Ity9X5m1f5T2Zr5gV8yrJHiXH_eEdu7ItutnyfYzAAKV0boJ40QBSwPiS5-vrXSNMg/exec";
 
-<head>
 
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <title>Absensi Karyawan</title>
-
-  <script src="https://unpkg.com/html5-qrcode"
-          type="text/javascript"></script>
-
-  <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 450px;
-      margin: 20px auto;
-      padding: 22px;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-      text-align: center;
-    }
-
-    h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #1a73e8;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-
-    #reader {
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-    }
-
-    #hasil {
-      margin-top: 18px;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      line-height: 1.6;
-    }
-
-    .normal {
-      background: #f1f3f4;
-      color: #333;
-    }
-
-    .success {
-      background: #e6f4ea;
-      color: #188038;
-    }
-
-    .error {
-      background: #fce8e6;
-      color: #d93025;
-    }
-
-    .member {
-      background: #e8f0fe;
-      color: #174ea6;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-  </style>
-
-</head>
-
-
-<body>
-
-
-<div class="container">
-
-  <h2>
-    📋 ABSENSI KARYAWAN
-  </h2>
-
-
-  <!-- =====================================
-       REGISTRASI MEMBER
-       ===================================== -->
-
-  <div id="registrasi">
-
-    <p>
-      HP ini belum terdaftar sebagai Member.
-    </p>
-
-    <input
-      type="text"
-      id="idKaryawan"
-      placeholder="ID Karyawan"
-      autocomplete="off"
-    >
-
-    <input
-      type="text"
-      id="namaKaryawan"
-      placeholder="Nama Karyawan"
-      autocomplete="off"
-    >
-
-    <button
-      type="button"
-      id="btnDaftar"
-      onclick="daftarMember()"
-    >
-      DAFTAR MEMBER
-    </button>
-
-  </div>
-
-
-  <!-- =====================================
-       MEMBER AKTIF
-       ===================================== -->
-
-  <div
-    id="member"
-    class="hidden"
-  >
-
-    <div class="member">
-
-      👤 <b>MEMBER AKTIF</b>
-
-      <br><br>
-
-      <span id="namaMember"></span>
-
-    </div>
-
-
-    <div id="reader"></div>
-
-
-    <div
-      id="hasil"
-      class="normal"
-    >
-      Menyiapkan kamera...
-    </div>
-
-
-    <p>
-      Arahkan kamera belakang ke QR perusahaan.
-    </p>
-
-  </div>
-
-</div>
-
-
-<script>
-
-
-// ==================================================
-// PENGATURAN
-// ==================================================
-
-const TOKEN_PERUSAHAAN =
-  "COMPANY-ABSEN";
-
-
-// ==================================================
-// MEMBER TOKEN
-// ==================================================
-
-let memberToken =
-  localStorage.getItem("memberToken");
-
-
-// ==================================================
-// SCANNER
-// ==================================================
-
-let scanner = null;
-
-let sudahScan = false;
-
-
-// ==================================================
-// HALAMAN DIBUKA
-// ==================================================
-
-window.addEventListener(
-  "load",
-  function() {
-
-    cekMember();
-
-  }
-);
-
-
-// ==================================================
-// CEK MEMBER
-// ==================================================
-
-function cekMember() {
-
-  if (memberToken) {
-
-    tampilkanMember();
-
-  } else {
-
-    document
-      .getElementById("registrasi")
-      .classList.remove("hidden");
-
-  }
-
-}
-
-
-// ==================================================
-// REGISTRASI MEMBER
-// ==================================================
-
-function daftarMember() {
+async function daftarMember() {
 
   const id =
-    document
-      .getElementById("idKaryawan")
-      .value
-      .trim();
-
+    document.getElementById("idKaryawan")
+      .value.trim();
 
   const nama =
-    document
-      .getElementById("namaKaryawan")
-      .value
-      .trim();
-
+    document.getElementById("namaKaryawan")
+      .value.trim();
 
   const tombol =
-    document
-      .getElementById("btnDaftar");
+    document.getElementById("btnDaftar");
 
-
-  // VALIDASI ID
 
   if (!id) {
-
-    alert(
-      "ID Karyawan harus diisi."
-    );
-
+    alert("ID Karyawan harus diisi.");
     return;
-
   }
 
-
-  // VALIDASI NAMA
-
   if (!nama) {
-
-    alert(
-      "Nama Karyawan harus diisi."
-    );
-
+    alert("Nama Karyawan harus diisi.");
     return;
-
   }
 
 
   tombol.disabled = true;
-
-  tombol.innerText =
-    "MEMPROSES...";
-
-
-  // ==================================================
-  // KIRIM KE GOOGLE APPS SCRIPT
-  // ==================================================
-
-  google.script.run
-
-    .withSuccessHandler(
-      function(result) {
-
-        console.log(
-          "Hasil registrasi:",
-          result
-        );
-
-
-        if (
-          result &&
-          result.sukses
-        ) {
-
-
-          // SIMPAN TOKEN MEMBER
-
-          localStorage.setItem(
-            "memberToken",
-            result.memberToken
-          );
-
-
-          localStorage.setItem(
-            "memberNama",
-            result.nama
-          );
-
-
-          localStorage.setItem(
-            "memberID",
-            result.id
-          );
-
-
-          memberToken =
-            result.memberToken;
-
-
-          alert(
-            "✅ " +
-            result.pesan
-          );
-
-
-          tampilkanMember();
-
-
-        } else {
-
-
-          alert(
-            "❌ " +
-            (
-              result &&
-              result.pesan
-                ? result.pesan
-                : "Registrasi gagal."
-            )
-          );
-
-
-          tombol.disabled = false;
-
-          tombol.innerText =
-            "DAFTAR MEMBER";
-
-        }
-
-      }
-    )
-
-
-    .withFailureHandler(
-      function(error) {
-
-        console.error(
-          "ERROR REGISTRASI:",
-          error
-        );
-
-
-        alert(
-          "❌ Terjadi kesalahan saat registrasi."
-        );
-
-
-        tombol.disabled = false;
-
-        tombol.innerText =
-          "DAFTAR MEMBER";
-
-      }
-    )
-
-
-    .registrasiMember(
-      id,
-      nama
-    );
-
-}
-
-
-// ==================================================
-// TAMPILKAN MEMBER
-// ==================================================
-
-function tampilkanMember() {
-
-  document
-    .getElementById("registrasi")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("member")
-    .classList.remove("hidden");
-
-
-  const nama =
-    localStorage.getItem(
-      "memberNama"
-    );
-
-
-  document
-    .getElementById("namaMember")
-    .innerText =
-    nama || "Member";
-
-
-  mulaiScanner();
-
-}
-
-
-// ==================================================
-// MULAI SCANNER
-// ==================================================
-
-async function mulaiScanner() {
-
-  const hasil =
-    document.getElementById("hasil");
+  tombol.innerText = "MEMPROSES...";
 
 
   try {
 
-    hasil.className =
-      "normal";
+    const response =
+      await fetch(API_URL, {
 
+        method: "POST",
 
-    hasil.innerHTML =
-      "📷 Meminta izin kamera...";
-
-
-    // MINTA IZIN KAMERA
-
-    await navigator.mediaDevices
-      .getUserMedia({
-
-        video: {
-          facingMode: {
-            ideal: "environment"
-          }
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
         },
 
-        audio: false
+        body: JSON.stringify({
+
+          aksi: "registrasiMember",
+
+          id: id,
+
+          nama: nama
+
+        })
 
       });
 
 
-    // CARI KAMERA
-
-    const cameras =
-      await Html5Qrcode.getCameras();
-
-
-    if (
-      !cameras ||
-      cameras.length === 0
-    ) {
-
-      throw new Error(
-        "Kamera tidak ditemukan."
-      );
-
-    }
-
-
-    // ==================================================
-    // CARI KAMERA BELAKANG
-    // ==================================================
-
-    let kameraBelakang =
-      cameras.find(
-        function(camera) {
-
-          const nama =
-            String(
-              camera.label
-            ).toLowerCase();
-
-
-          return (
-
-            nama.includes("back") ||
-
-            nama.includes("rear") ||
-
-            nama.includes("environment") ||
-
-            nama.includes("belakang")
-
-          );
-
-        }
-      );
-
-
-    // JIKA TIDAK DITEMUKAN,
-    // COBA KAMERA TERAKHIR
-
-    if (!kameraBelakang) {
-
-      kameraBelakang =
-        cameras[
-          cameras.length - 1
-        ];
-
-    }
+    const result =
+      await response.json();
 
 
     console.log(
-      "Kamera digunakan:",
-      kameraBelakang
+      "HASIL REGISTRASI:",
+      result
     );
 
 
-    // ==================================================
-    // BUAT SCANNER
-    // ==================================================
+    if (result.sukses) {
 
-    scanner =
-      new Html5Qrcode(
-        "reader"
+      localStorage.setItem(
+        "memberToken",
+        result.memberToken
+      );
+
+      localStorage.setItem(
+        "memberNama",
+        result.nama
+      );
+
+      localStorage.setItem(
+        "memberID",
+        result.id
+      );
+
+      memberToken =
+        result.memberToken;
+
+
+      alert(
+        "✅ " + result.pesan
       );
 
 
-    await scanner.start(
-
-      kameraBelakang.id,
-
-      {
-
-        fps: 10,
-
-        qrbox: {
-          width: 250,
-          height: 250
-        },
-
-        aspectRatio: 1.0,
-
-        disableFlip: false
-
-      },
-
-      onScanSuccess,
-
-      function(error) {
-        // abaikan error scan sementara
-      }
-
-    );
+      tampilkanMember();
 
 
-    hasil.className =
-      "normal";
+    } else {
 
-
-    hasil.innerHTML =
-      "📷 <b>Kamera belakang aktif</b>" +
-      "<br>" +
-      "Arahkan ke QR perusahaan.";
-
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "ERROR KAMERA:",
-      error
-    );
-
-
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ Kamera tidak dapat digunakan." +
-      "<br><br>" +
-      error.message;
-
-  }
-
-}
-
-
-// ==================================================
-// QR BERHASIL TERBACA
-// ==================================================
-
-function onScanSuccess(
-  decodedText
-) {
-
-
-  if (sudahScan) {
-
-    return;
-
-  }
-
-
-  const token =
-    String(
-      decodedText
-    ).trim();
-
-
-  console.log(
-    "QR TERBACA:",
-    token
-  );
-
-
-  // ==================================================
-  // CEK QR PERUSAHAAN
-  // ==================================================
-
-  if (
-    token !==
-    TOKEN_PERUSAHAAN
-  ) {
-
-    const hasil =
-      document.getElementById(
-        "hasil"
+      alert(
+        "❌ " + result.pesan
       );
 
+      tombol.disabled = false;
 
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ QR bukan QR perusahaan.";
-
-
-    return;
-
-  }
-
-
-  // ==================================================
-  // QR VALID
-  // ==================================================
-
-  sudahScan = true;
-
-
-  const hasil =
-    document.getElementById(
-      "hasil"
-    );
-
-
-  hasil.className =
-    "success";
-
-
-  hasil.innerHTML =
-    "✅ <b>QR PERUSAHAAN VALID</b>" +
-    "<br><br>" +
-    "Member: " +
-    localStorage.getItem(
-      "memberNama"
-    );
-
-
-  // ==================================================
-  // HENTIKAN KAMERA
-  // ==================================================
-
-  if (scanner) {
-
-    scanner.stop()
-      .then(
-        function() {
-
-          console.log(
-            "Scanner dihentikan."
-          );
-
-
-          scanner.clear()
-            .catch(function() {});
-
-
-          ambilGPSDanAbsen();
-
-        }
-      )
-      .catch(
-        function(error) {
-
-          console.log(
-            "Gagal menghentikan scanner:",
-            error
-          );
-
-
-          ambilGPSDanAbsen();
-
-        }
-      );
-
-  } else {
-
-    ambilGPSDanAbsen();
-
-  }
-
-}
-
-
-// ==================================================
-// GPS
-// ==================================================
-
-function ambilGPSDanAbsen() {
-
-  const hasil =
-    document.getElementById(
-      "hasil"
-    );
-
-
-  hasil.className =
-    "normal";
-
-
-  hasil.innerHTML =
-    "📍 Mengambil lokasi GPS...";
-
-
-  if (
-    !navigator.geolocation
-  ) {
-
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ Browser tidak mendukung GPS.";
-
-
-    sudahScan = false;
-
-
-    return;
-
-  }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-
-      const latitude =
-        position.coords.latitude;
-
-
-      const longitude =
-        position.coords.longitude;
-
-
-      console.log(
-        "GPS:",
-        latitude,
-        longitude
-      );
-
-
-      hasil.innerHTML =
-        "📍 GPS berhasil." +
-        "<br>" +
-        "⏳ Menyimpan absensi...";
-
-
-      // ==================================================
-      // KIRIM ABSENSI KE APPS SCRIPT
-      // ==================================================
-
-      google.script.run
-
-        .withSuccessHandler(
-          function(result) {
-
-
-            console.log(
-              "HASIL ABSENSI:",
-              result
-            );
-
-
-            if (
-              result &&
-              result.sukses
-            ) {
-
-
-              hasil.className =
-                "success";
-
-
-              // ==============================
-              // ABSEN MASUK
-              // ==============================
-
-              if (
-                result.tipe ===
-                "MASUK"
-              ) {
-
-                hasil.innerHTML =
-
-                  "✅ <b>ABSEN MASUK BERHASIL</b>" +
-
-                  "<br><br>" +
-
-                  "Nama: " +
-                  result.nama +
-
-                  "<br>" +
-
-                  "Waktu: " +
-                  result.waktu;
-
-              }
-
-
-              // ==============================
-              // ABSEN KELUAR
-              // ==============================
-
-              else if (
-                result.tipe ===
-                "KELUAR"
-              ) {
-
-                hasil.innerHTML =
-
-                  "✅ <b>ABSEN KELUAR BERHASIL</b>" +
-
-                  "<br><br>" +
-
-                  "Nama: " +
-                  result.nama +
-
-                  "<br>" +
-
-                  "Waktu: " +
-                  result.waktu +
-
-                  "<br>" +
-
-                  "Total: " +
-                  result.totalJam +
-
-                  "<br>" +
-
-                  "Status: " +
-                  result.status;
-
-              }
-
-
-              // RELOAD 5 DETIK
-
-              setTimeout(
-                function() {
-
-                  location.reload();
-
-                },
-                5000
-              );
-
-
-            } else {
-
-
-              hasil.className =
-                "error";
-
-
-              hasil.innerHTML =
-                "❌ " +
-                (
-                  result &&
-                  result.pesan
-                    ? result.pesan
-                    : "Absensi gagal."
-                );
-
-
-              sudahScan =
-                false;
-
-            }
-
-          }
-        )
-
-
-        .withFailureHandler(
-          function(error) {
-
-
-            console.error(
-              "ERROR ABSENSI:",
-              error
-            );
-
-
-            hasil.className =
-              "error";
-
-
-            hasil.innerHTML =
-              "❌ Gagal menyimpan absensi.";
-
-
-            sudahScan =
-              false;
-
-          }
-        )
-
-
-        .prosesAbsensiMember(
-
-          memberToken,
-
-          latitude,
-
-          longitude
-
-        );
-
-    },
-
-
-    function(error) {
-
-
-      hasil.className =
-        "error";
-
-
-      if (
-        error.code === 1
-      ) {
-
-        hasil.innerHTML =
-          "❌ Izin lokasi ditolak." +
-          "<br>" +
-          "Silakan izinkan GPS pada browser.";
-
-      }
-
-      else if (
-        error.code === 2
-      ) {
-
-        hasil.innerHTML =
-          "❌ Lokasi tidak tersedia.";
-
-      }
-
-      else if (
-        error.code === 3
-      ) {
-
-        hasil.innerHTML =
-          "❌ Pengambilan lokasi terlalu lama.";
-
-      }
-
-      else {
-
-        hasil.innerHTML =
-          "❌ GPS tidak dapat diperoleh.";
-
-      }
-
-
-      sudahScan =
-        false;
-
-    },
-
-
-    {
-
-      enableHighAccuracy:
-        true,
-
-      timeout:
-        15000,
-
-      maximumAge:
-        0
+      tombol.innerText =
+        "DAFTAR MEMBER";
 
     }
 
-  );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Tidak dapat terhubung ke server absensi."
+    );
+
+    tombol.disabled = false;
+
+    tombol.innerText =
+      "DAFTAR MEMBER";
+
+  }
 
 }
-
-</script>
-
-</body>
-</html>
