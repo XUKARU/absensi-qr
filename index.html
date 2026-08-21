@@ -6,13 +6,14 @@
   <meta charset="UTF-8">
 
   <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+        content="width=device-width, initial-scale=1.0">
 
   <title>Absensi Karyawan</title>
 
-  <!-- Library QR Scanner -->
+  <!-- LIBRARY QR SCANNER -->
   <script src="https://unpkg.com/html5-qrcode"
           type="text/javascript"></script>
+
 
   <style>
 
@@ -23,70 +24,138 @@
     body {
       margin: 0;
       padding: 20px;
+
       font-family: Arial, sans-serif;
+
       background: #f2f4f7;
     }
 
-    .box {
+
+    .container {
+
+      width: 100%;
       max-width: 450px;
-      margin: 30px auto;
+
+      margin: 20px auto;
+
+      padding: 20px;
+
       background: white;
-      padding: 25px;
+
       border-radius: 15px;
+
+      box-shadow:
+        0 4px 15px rgba(0,0,0,0.12);
+
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
     }
+
 
     h2 {
+
       margin-top: 0;
+
+      margin-bottom: 20px;
     }
+
 
     #reader {
+
       width: 100%;
-      margin-top: 15px;
+
+      max-width: 400px;
+
+      margin: auto;
     }
 
-    button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #1a73e8;
-      color: white;
-      font-size: 17px;
-      cursor: pointer;
-    }
 
     #hasil {
+
       margin-top: 20px;
-      font-size: 17px;
+
+      padding: 12px;
+
+      border-radius: 8px;
+
+      font-size: 16px;
+
       font-weight: bold;
+
       line-height: 1.6;
     }
 
+
+    .normal {
+
+      background: #f1f3f4;
+
+      color: #333;
+    }
+
+
     .success {
+
+      background: #e6f4ea;
+
       color: #188038;
     }
 
+
     .error {
+
+      background: #fce8e6;
+
       color: #d93025;
+    }
+
+
+    .info {
+
+      margin-top: 15px;
+
+      font-size: 14px;
+
+      color: #666;
+
+      line-height: 1.5;
     }
 
   </style>
 
 </head>
 
+
 <body>
 
-<div class="box">
 
-  <h2>📷 ABSENSI KARYAWAN</h2>
+<div class="container">
+
+  <h2>
+    📷 ABSENSI KARYAWAN
+  </h2>
+
 
   <div id="reader"></div>
 
-  <div id="hasil">
+
+  <div id="hasil"
+       class="normal">
+
+    Memulai kamera...
+
+  </div>
+
+
+  <div class="info">
+
     Arahkan kamera ke QR perusahaan.
+
+    <br>
+
+    QR perusahaan:
+
+    <b>COMPANY-ABSEN</b>
+
   </div>
 
 </div>
@@ -94,118 +163,218 @@
 
 <script>
 
+
+// ==================================================
+// TOKEN QR PERUSAHAAN
+// ==================================================
+
 const TOKEN_PERUSAHAAN =
   "COMPANY-ABSEN";
 
-let sudahScan = false;
+
+let sudahBerhasil =
+  false;
 
 
-// ========================================
-// QR BERHASIL DIBACA
-// ========================================
+// ==================================================
+// ELEMENT HASIL
+// ==================================================
 
-function qrBerhasil(decodedText, decodedResult) {
+const hasil =
+  document.getElementById("hasil");
 
-  if (sudahScan) {
+
+// ==================================================
+// KETIKA QR BERHASIL DIBACA
+// ==================================================
+
+function onScanSuccess(
+  decodedText,
+  decodedResult
+) {
+
+  console.log(
+    "QR terbaca:",
+    decodedText
+  );
+
+
+  // Jangan proses berkali-kali
+  if (sudahBerhasil) {
+
     return;
+
   }
 
-  sudahScan = true;
 
-  console.log("QR:", decodedText);
-
-  const hasil =
-    document.getElementById("hasil");
+  // Bersihkan hasil scan
+  const token =
+    String(decodedText).trim();
 
 
-  // ========================================
-  // VALIDASI QR PERUSAHAAN
-  // ========================================
+  // ==================================================
+  // CEK TOKEN
+  // ==================================================
 
   if (
-    decodedText.trim() ===
+    token ===
     TOKEN_PERUSAHAAN
   ) {
+
+
+    sudahBerhasil =
+      true;
+
 
     hasil.className =
       "success";
 
+
     hasil.innerHTML =
-      "✅ QR PERUSAHAAN VALID" +
+
+      "✅ <b>QR PERUSAHAAN VALID</b>" +
+
       "<br><br>" +
+
       "Token: " +
-      decodedText;
+
+      token;
+
+
+    console.log(
+      "QR perusahaan valid."
+    );
+
+
+    // Hentikan scanner
+    if (window.scanner) {
+
+      window.scanner.clear()
+        .catch(function(error) {
+
+          console.log(
+            "Scanner tidak dapat dihentikan:",
+            error
+          );
+
+        });
+
+    }
+
 
   } else {
+
 
     hasil.className =
       "error";
 
+
     hasil.innerHTML =
-      "❌ QR BUKAN QR PERUSAHAAN" +
+
+      "❌ <b>QR TIDAK VALID</b>" +
+
       "<br><br>" +
-      "Token terbaca: " +
-      decodedText;
 
-    setTimeout(function() {
+      "Isi QR:" +
 
-      sudahScan = false;
+      "<br>" +
 
-    }, 2000);
+      token;
+
+
+    console.log(
+      "QR bukan QR perusahaan:",
+      token
+    );
 
   }
 
 }
 
 
-// ========================================
-// ERROR SCAN
-// ========================================
+// ==================================================
+// KETIKA QR BELUM TERBACA
+// ==================================================
 
-function qrError(errorMessage) {
+function onScanFailure(
+  errorMessage
+) {
 
-  // Tidak perlu menampilkan error
-  // setiap frame kamera.
+  // Jangan menampilkan error
+  // karena fungsi ini dipanggil
+  // berkali-kali selama scanning.
 
 }
 
 
-// ========================================
-// MULAI SCANNER
-// ========================================
+// ==================================================
+// BUAT SCANNER
+// ==================================================
 
-const scanner =
-  new Html5QrcodeScanner(
-
-    "reader",
-
-    {
-      fps: 10,
-
-      qrbox: {
-        width: 250,
-        height: 250
-      },
-
-      rememberLastUsedCamera: true,
-
-      supportedScanTypes: [
-        Html5QrcodeScanType.SCAN_TYPE_CAMERA
-      ]
-
-    },
-
-    false
-
-  );
+window.addEventListener(
+  "load",
+  function() {
 
 
-scanner.render(
-  qrBerhasil,
-  qrError
+    hasil.className =
+      "normal";
+
+
+    hasil.innerHTML =
+      "📷 Kamera sedang dimulai...";
+
+
+    window.scanner =
+      new Html5QrcodeScanner(
+
+        "reader",
+
+        {
+
+          fps: 10,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          aspectRatio: 1.0,
+
+          rememberLastUsedCamera: true,
+
+          showTorchButtonIfSupported: true,
+
+          showZoomSliderIfSupported: true,
+
+          defaultCameraStartOptions: {
+
+            facingMode:
+              "environment"
+
+          }
+
+        },
+
+        false
+
+      );
+
+
+    window.scanner.render(
+
+      onScanSuccess,
+
+      onScanFailure
+
+    );
+
+
+  }
+
 );
 
 </script>
+
 
 </body>
 
