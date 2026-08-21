@@ -30,7 +30,6 @@
       background: #f2f4f7;
     }
 
-
     .container {
 
       width: 100%;
@@ -50,24 +49,18 @@
       text-align: center;
     }
 
-
     h2 {
-
       margin-top: 0;
-
       margin-bottom: 20px;
     }
-
 
     #reader {
 
       width: 100%;
-
       max-width: 400px;
 
       margin: auto;
     }
-
 
     #hasil {
 
@@ -84,30 +77,23 @@
       line-height: 1.6;
     }
 
-
     .normal {
 
       background: #f1f3f4;
-
       color: #333;
     }
-
 
     .success {
 
       background: #e6f4ea;
-
       color: #188038;
     }
-
 
     .error {
 
       background: #fce8e6;
-
       color: #d93025;
     }
-
 
     .info {
 
@@ -141,14 +127,14 @@
   <div id="hasil"
        class="normal">
 
-    Memulai kamera...
+    Mencari kamera belakang...
 
   </div>
 
 
   <div class="info">
 
-    Arahkan kamera ke QR perusahaan.
+    Arahkan kamera belakang ke QR perusahaan.
 
     <br>
 
@@ -176,6 +162,9 @@ let sudahBerhasil =
   false;
 
 
+let scanner = null;
+
+
 // ==================================================
 // ELEMENT HASIL
 // ==================================================
@@ -185,7 +174,7 @@ const hasil =
 
 
 // ==================================================
-// KETIKA QR BERHASIL DIBACA
+// QR BERHASIL DIBACA
 // ==================================================
 
 function onScanSuccess(
@@ -199,7 +188,6 @@ function onScanSuccess(
   );
 
 
-  // Jangan proses berkali-kali
   if (sudahBerhasil) {
 
     return;
@@ -207,20 +195,18 @@ function onScanSuccess(
   }
 
 
-  // Bersihkan hasil scan
   const token =
     String(decodedText).trim();
 
 
   // ==================================================
-  // CEK TOKEN
+  // VALIDASI QR PERUSAHAAN
   // ==================================================
 
   if (
     token ===
     TOKEN_PERUSAHAAN
   ) {
-
 
     sudahBerhasil =
       true;
@@ -246,10 +232,10 @@ function onScanSuccess(
     );
 
 
-    // Hentikan scanner
-    if (window.scanner) {
+    // Hentikan kamera
+    if (scanner) {
 
-      window.scanner.clear()
+      scanner.clear()
         .catch(function(error) {
 
           console.log(
@@ -263,7 +249,6 @@ function onScanSuccess(
 
 
   } else {
-
 
     hasil.className =
       "error";
@@ -287,80 +272,164 @@ function onScanSuccess(
       token
     );
 
+
   }
 
 }
 
 
 // ==================================================
-// KETIKA QR BELUM TERBACA
+// QR BELUM TERBACA
 // ==================================================
 
 function onScanFailure(
   errorMessage
 ) {
 
-  // Jangan menampilkan error
-  // karena fungsi ini dipanggil
-  // berkali-kali selama scanning.
+  // Tidak menampilkan error.
+  // Fungsi ini dipanggil terus
+  // selama scanner mencari QR.
 
 }
 
 
 // ==================================================
-// BUAT SCANNER
+// CARI KAMERA BELAKANG
 // ==================================================
 
-window.addEventListener(
-  "load",
-  function() {
+async function mulaiScanner() {
 
+  try {
 
     hasil.className =
       "normal";
 
-
     hasil.innerHTML =
-      "📷 Kamera sedang dimulai...";
+      "📷 Meminta izin kamera...";
 
 
-    window.scanner =
-      new Html5QrcodeScanner(
+    // ==================================================
+    // MINTA IZIN KAMERA
+    // ==================================================
 
-        "reader",
+    await navigator.mediaDevices
+      .getUserMedia({
 
-        {
+        video: true,
 
-          fps: 10,
+        audio: false
 
-          qrbox: {
-            width: 250,
-            height: 250
-          },
+      });
 
-          aspectRatio: 1.0,
 
-          rememberLastUsedCamera: true,
+    // ==================================================
+    // AMBIL DAFTAR KAMERA
+    // ==================================================
 
-          showTorchButtonIfSupported: true,
+    const cameras =
+      await Html5Qrcode
+        .getCameras();
 
-          showZoomSliderIfSupported: true,
 
-          defaultCameraStartOptions: {
+    if (
+      !cameras ||
+      cameras.length === 0
+    ) {
 
-            facingMode:
-              "environment"
-
-          }
-
-        },
-
-        false
-
+      throw new Error(
+        "Kamera tidak ditemukan."
       );
 
+    }
 
-    window.scanner.render(
+
+    console.log(
+      "Daftar kamera:",
+      cameras
+    );
+
+
+    // ==================================================
+    // CARI KAMERA BELAKANG
+    // ==================================================
+
+    let kameraBelakang =
+      cameras.find(function(camera) {
+
+        const nama =
+          camera.label.toLowerCase();
+
+        return (
+
+          nama.includes("back") ||
+
+          nama.includes("rear") ||
+
+          nama.includes("environment") ||
+
+          nama.includes("belakang")
+
+        );
+
+      });
+
+
+    // ==================================================
+    // JIKA KAMERA BELAKANG
+    // TIDAK DITEMUKAN
+    // GUNAKAN KAMERA TERAKHIR
+    // ==================================================
+
+    if (!kameraBelakang) {
+
+      kameraBelakang =
+        cameras[cameras.length - 1];
+
+    }
+
+
+    console.log(
+      "Kamera yang digunakan:",
+      kameraBelakang.label
+    );
+
+
+    // ==================================================
+    // BUAT SCANNER
+    // ==================================================
+
+    scanner =
+      new Html5Qrcode("reader");
+
+
+    hasil.innerHTML =
+      "📷 Kamera belakang aktif." +
+      "<br>" +
+      "Arahkan ke QR perusahaan.";
+
+
+    // ==================================================
+    // MULAI KAMERA BELAKANG
+    // ==================================================
+
+    await scanner.start(
+
+      kameraBelakang.id,
+
+      {
+
+        fps: 10,
+
+        qrbox: {
+          width: 250,
+          height: 250
+        },
+
+        aspectRatio: 1.0,
+
+        disableFlip: false
+
+      },
 
       onScanSuccess,
 
@@ -369,8 +438,41 @@ window.addEventListener(
     );
 
 
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    hasil.className =
+      "error";
+
+
+    hasil.innerHTML =
+
+      "❌ Kamera tidak dapat digunakan." +
+
+      "<br><br>" +
+
+      error.message;
+
   }
 
+}
+
+
+// ==================================================
+// MULAI SAAT HALAMAN DIBUKA
+// ==================================================
+
+window.addEventListener(
+  "load",
+  function() {
+
+    mulaiScanner();
+
+  }
 );
 
 </script>
