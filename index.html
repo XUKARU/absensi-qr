@@ -2,12 +2,17 @@
 <html lang="id">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta name="viewport"
         content="width=device-width, initial-scale=1">
 
   <title>Absensi Karyawan</title>
+
+  <!-- Library QR Scanner -->
+  <script src="https://unpkg.com/html5-qrcode"
+          type="text/javascript"></script>
 
   <style>
 
@@ -36,10 +41,8 @@
       margin-top: 0;
     }
 
-    video {
+    #reader {
       width: 100%;
-      border-radius: 12px;
-      background: black;
       margin-top: 15px;
     }
 
@@ -53,10 +56,6 @@
       color: white;
       font-size: 17px;
       cursor: pointer;
-    }
-
-    button:disabled {
-      background: #999;
     }
 
     #hasil {
@@ -84,23 +83,10 @@
 
   <h2>📷 ABSENSI KARYAWAN</h2>
 
-  <video
-    id="video"
-    autoplay
-    playsinline>
-  </video>
-
-  <button id="btnKamera"
-          onclick="mulaiKamera()">
-
-    MULAI KAMERA
-
-  </button>
+  <div id="reader"></div>
 
   <div id="hasil">
-
-    Tekan MULAI KAMERA
-
+    Arahkan kamera ke QR perusahaan.
   </div>
 
 </div>
@@ -108,88 +94,116 @@
 
 <script>
 
-let stream = null;
-let scanning = false;
-
 const TOKEN_PERUSAHAAN =
-  "COMPANY-ABSEN-2026";
+  "COMPANY-ABSEN";
+
+let sudahScan = false;
 
 
 // ========================================
-// MULAI KAMERA
+// QR BERHASIL DIBACA
 // ========================================
 
-async function mulaiKamera() {
+function qrBerhasil(decodedText, decodedResult) {
+
+  if (sudahScan) {
+    return;
+  }
+
+  sudahScan = true;
+
+  console.log("QR:", decodedText);
 
   const hasil =
     document.getElementById("hasil");
 
-  const tombol =
-    document.getElementById("btnKamera");
 
+  // ========================================
+  // VALIDASI QR PERUSAHAAN
+  // ========================================
 
-  try {
+  if (
+    decodedText.trim() ===
+    TOKEN_PERUSAHAAN
+  ) {
 
-    stream =
-      await navigator.mediaDevices.getUserMedia({
-
-        video: {
-          facingMode: {
-            ideal: "environment"
-          }
-        },
-
-        audio: false
-
-      });
-
-
-    const video =
-      document.getElementById("video");
-
-
-    video.srcObject =
-      stream;
-
-
-    scanning =
-      true;
-
-
-    tombol.disabled =
-      true;
-
+    hasil.className =
+      "success";
 
     hasil.innerHTML =
-      "📷 Kamera aktif.<br>" +
-      "Arahkan kamera ke QR perusahaan.";
+      "✅ QR PERUSAHAAN VALID" +
+      "<br><br>" +
+      "Token: " +
+      decodedText;
 
-
-    // Untuk tahap pertama kita
-    // belum membaca QR dulu.
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
+  } else {
 
     hasil.className =
       "error";
 
-
     hasil.innerHTML =
-      "❌ Kamera tidak dapat digunakan.<br>" +
-      error.message;
+      "❌ QR BUKAN QR PERUSAHAAN" +
+      "<br><br>" +
+      "Token terbaca: " +
+      decodedText;
 
+    setTimeout(function() {
 
-    tombol.disabled =
-      false;
+      sudahScan = false;
+
+    }, 2000);
 
   }
 
 }
+
+
+// ========================================
+// ERROR SCAN
+// ========================================
+
+function qrError(errorMessage) {
+
+  // Tidak perlu menampilkan error
+  // setiap frame kamera.
+
+}
+
+
+// ========================================
+// MULAI SCANNER
+// ========================================
+
+const scanner =
+  new Html5QrcodeScanner(
+
+    "reader",
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+
+      rememberLastUsedCamera: true,
+
+      supportedScanTypes: [
+        Html5QrcodeScanType.SCAN_TYPE_CAMERA
+      ]
+
+    },
+
+    false
+
+  );
+
+
+scanner.render(
+  qrBerhasil,
+  qrError
+);
 
 </script>
 
