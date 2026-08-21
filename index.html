@@ -2,7 +2,7 @@
 <html lang="id">
 
 <head>
-
+f
   <meta charset="UTF-8">
 
   <meta name="viewport"
@@ -235,18 +235,24 @@ function onScanSuccess(
     // Hentikan kamera
     if (scanner) {
 
-      scanner.clear()
-        .catch(function(error) {
+  scanner.stop()
+    .then(function() {
 
-          console.log(
-            "Scanner tidak dapat dihentikan:",
-            error
-          );
+      console.log("Kamera berhasil dihentikan.");
 
-        });
+      return scanner.clear();
 
-    }
+    })
+    .catch(function(error) {
 
+      console.log(
+        "Gagal menghentikan kamera:",
+        error
+      );
+
+    });
+
+}
 
   } else {
 
