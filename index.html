@@ -65,6 +65,7 @@
 
     button:disabled {
       background: #999;
+      cursor: not-allowed;
     }
 
     #reader {
@@ -118,23 +119,20 @@
 
 <div class="container">
 
-
   <h2>
     📋 ABSENSI KARYAWAN
   </h2>
 
 
-  <!-- =========================================
+  <!-- =====================================
        REGISTRASI MEMBER
-       ========================================= -->
+       ===================================== -->
 
   <div id="registrasi">
-
 
     <p>
       HP ini belum terdaftar sebagai Member.
     </p>
-
 
     <input
       type="text"
@@ -143,7 +141,6 @@
       autocomplete="off"
     >
 
-
     <input
       type="text"
       id="namaKaryawan"
@@ -151,23 +148,20 @@
       autocomplete="off"
     >
 
-
     <button
+      type="button"
       id="btnDaftar"
       onclick="daftarMember()"
     >
-
       DAFTAR MEMBER
-
     </button>
-
 
   </div>
 
 
-  <!-- =========================================
+  <!-- =====================================
        MEMBER AKTIF
-       ========================================= -->
+       ===================================== -->
 
   <div
     id="member"
@@ -192,9 +186,7 @@
       id="hasil"
       class="normal"
     >
-
-      Mencari kamera belakang...
-
+      Menyiapkan kamera...
     </div>
 
 
@@ -204,7 +196,6 @@
 
   </div>
 
-
 </div>
 
 
@@ -212,18 +203,24 @@
 
 
 // ==================================================
-// VARIABEL
+// PENGATURAN
 // ==================================================
 
 const TOKEN_PERUSAHAAN =
   "COMPANY-ABSEN";
 
 
-let memberToken =
-  localStorage.getItem(
-    "memberToken"
-  );
+// ==================================================
+// MEMBER TOKEN
+// ==================================================
 
+let memberToken =
+  localStorage.getItem("memberToken");
+
+
+// ==================================================
+// SCANNER
+// ==================================================
 
 let scanner = null;
 
@@ -231,7 +228,7 @@ let sudahScan = false;
 
 
 // ==================================================
-// SAAT HALAMAN DIBUKA
+// HALAMAN DIBUKA
 // ==================================================
 
 window.addEventListener(
@@ -245,21 +242,17 @@ window.addEventListener(
 
 
 // ==================================================
-// CEK MEMBER DI HP
+// CEK MEMBER
 // ==================================================
 
 function cekMember() {
 
-  if (
-    memberToken
-  ) {
+  if (memberToken) {
 
-    // HP sudah menjadi member
     tampilkanMember();
 
   } else {
 
-    // HP belum menjadi member
     document
       .getElementById("registrasi")
       .classList.remove("hidden");
@@ -270,7 +263,7 @@ function cekMember() {
 
 
 // ==================================================
-// DAFTAR MEMBER
+// REGISTRASI MEMBER
 // ==================================================
 
 function daftarMember() {
@@ -294,6 +287,8 @@ function daftarMember() {
       .getElementById("btnDaftar");
 
 
+  // VALIDASI ID
+
   if (!id) {
 
     alert(
@@ -304,6 +299,8 @@ function daftarMember() {
 
   }
 
+
+  // VALIDASI NAMA
 
   if (!nama) {
 
@@ -316,27 +313,34 @@ function daftarMember() {
   }
 
 
-  tombol.disabled =
-    true;
+  tombol.disabled = true;
 
   tombol.innerText =
     "MEMPROSES...";
 
+
+  // ==================================================
+  // KIRIM KE GOOGLE APPS SCRIPT
+  // ==================================================
 
   google.script.run
 
     .withSuccessHandler(
       function(result) {
 
+        console.log(
+          "Hasil registrasi:",
+          result
+        );
+
 
         if (
+          result &&
           result.sukses
         ) {
 
 
-          // =====================================
-          // SIMPAN MEMBER TOKEN DI HP
-          // =====================================
+          // SIMPAN TOKEN MEMBER
 
           localStorage.setItem(
             "memberToken",
@@ -374,13 +378,16 @@ function daftarMember() {
 
           alert(
             "❌ " +
-            result.pesan
+            (
+              result &&
+              result.pesan
+                ? result.pesan
+                : "Registrasi gagal."
+            )
           );
 
 
-          tombol.disabled =
-            false;
-
+          tombol.disabled = false;
 
           tombol.innerText =
             "DAFTAR MEMBER";
@@ -390,29 +397,29 @@ function daftarMember() {
       }
     )
 
+
     .withFailureHandler(
       function(error) {
 
-
         console.error(
+          "ERROR REGISTRASI:",
           error
         );
 
 
         alert(
-          "❌ Terjadi kesalahan."
+          "❌ Terjadi kesalahan saat registrasi."
         );
 
 
-        tombol.disabled =
-          false;
-
+        tombol.disabled = false;
 
         tombol.innerText =
           "DAFTAR MEMBER";
 
       }
     )
+
 
     .registrasiMember(
       id,
@@ -427,7 +434,6 @@ function daftarMember() {
 // ==================================================
 
 function tampilkanMember() {
-
 
   document
     .getElementById("registrasi")
@@ -451,8 +457,6 @@ function tampilkanMember() {
     nama || "Member";
 
 
-  // Mulai scanner
-
   mulaiScanner();
 
 }
@@ -464,32 +468,40 @@ function tampilkanMember() {
 
 async function mulaiScanner() {
 
-
   const hasil =
-    document
-      .getElementById("hasil");
+    document.getElementById("hasil");
 
 
   try {
+
+    hasil.className =
+      "normal";
 
 
     hasil.innerHTML =
       "📷 Meminta izin kamera...";
 
 
+    // MINTA IZIN KAMERA
+
     await navigator.mediaDevices
       .getUserMedia({
 
-        video: true,
+        video: {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
 
         audio: false
 
       });
 
 
+    // CARI KAMERA
+
     const cameras =
-      await Html5Qrcode
-        .getCameras();
+      await Html5Qrcode.getCameras();
 
 
     if (
@@ -504,9 +516,9 @@ async function mulaiScanner() {
     }
 
 
-    // ==========================================
+    // ==================================================
     // CARI KAMERA BELAKANG
-    // ==========================================
+    // ==================================================
 
     let kameraBelakang =
       cameras.find(
@@ -534,12 +546,10 @@ async function mulaiScanner() {
       );
 
 
-    // Jika tidak ditemukan,
-    // gunakan kamera terakhir
+    // JIKA TIDAK DITEMUKAN,
+    // COBA KAMERA TERAKHIR
 
-    if (
-      !kameraBelakang
-    ) {
+    if (!kameraBelakang) {
 
       kameraBelakang =
         cameras[
@@ -548,6 +558,16 @@ async function mulaiScanner() {
 
     }
 
+
+    console.log(
+      "Kamera digunakan:",
+      kameraBelakang
+    );
+
+
+    // ==================================================
+    // BUAT SCANNER
+    // ==================================================
 
     scanner =
       new Html5Qrcode(
@@ -576,9 +596,15 @@ async function mulaiScanner() {
 
       onScanSuccess,
 
-      function(error) {}
+      function(error) {
+        // abaikan error scan sementara
+      }
 
     );
+
+
+    hasil.className =
+      "normal";
 
 
     hasil.innerHTML =
@@ -591,8 +617,8 @@ async function mulaiScanner() {
 
   catch(error) {
 
-
     console.error(
+      "ERROR KAMERA:",
       error
     );
 
@@ -612,7 +638,7 @@ async function mulaiScanner() {
 
 
 // ==================================================
-// HASIL SCAN QR
+// QR BERHASIL TERBACA
 // ==================================================
 
 function onScanSuccess(
@@ -620,9 +646,7 @@ function onScanSuccess(
 ) {
 
 
-  if (
-    sudahScan
-  ) {
+  if (sudahScan) {
 
     return;
 
@@ -635,20 +659,32 @@ function onScanSuccess(
     ).trim();
 
 
+  console.log(
+    "QR TERBACA:",
+    token
+  );
+
+
+  // ==================================================
+  // CEK QR PERUSAHAAN
+  // ==================================================
+
   if (
     token !==
     TOKEN_PERUSAHAAN
   ) {
 
-    document
-      .getElementById("hasil")
-      .className =
+    const hasil =
+      document.getElementById(
+        "hasil"
+      );
+
+
+    hasil.className =
       "error";
 
 
-    document
-      .getElementById("hasil")
-      .innerHTML =
+    hasil.innerHTML =
       "❌ QR bukan QR perusahaan.";
 
 
@@ -657,17 +693,17 @@ function onScanSuccess(
   }
 
 
-  // ==========================================
-  // QR PERUSAHAAN VALID
-  // ==========================================
+  // ==================================================
+  // QR VALID
+  // ==================================================
 
-  sudahScan =
-    true;
+  sudahScan = true;
 
 
   const hasil =
-    document
-      .getElementById("hasil");
+    document.getElementById(
+      "hasil"
+    );
 
 
   hasil.className =
@@ -681,27 +717,11 @@ function onScanSuccess(
     localStorage.getItem(
       "memberNama"
     );
-setTimeout(
-  function() {
 
-    if (scanner) {
 
-      scanner.stop()
-        .catch(function(error) {
-
-          console.log(error);
-
-        });
-
-    }
-
-    ambilGPSDanAbsen();
-
-  },
-  500
-);
-
-  // Hentikan scanner
+  // ==================================================
+  // HENTIKAN KAMERA
+  // ==================================================
 
   if (scanner) {
 
@@ -713,44 +733,72 @@ setTimeout(
             "Scanner dihentikan."
           );
 
+
+          scanner.clear()
+            .catch(function() {});
+
+
+          ambilGPSDanAbsen();
+
         }
       )
       .catch(
         function(error) {
 
           console.log(
+            "Gagal menghentikan scanner:",
             error
           );
+
+
+          ambilGPSDanAbsen();
 
         }
       );
 
+  } else {
+
+    ambilGPSDanAbsen();
+
   }
 
+}
 
-  // ==========================================
-// AMBIL GPS
-// ==========================================
+
+// ==================================================
+// GPS
+// ==================================================
 
 function ambilGPSDanAbsen() {
 
   const hasil =
-    document.getElementById("hasil");
+    document.getElementById(
+      "hasil"
+    );
+
 
   hasil.className =
     "normal";
+
 
   hasil.innerHTML =
     "📍 Mengambil lokasi GPS...";
 
 
-  if (!navigator.geolocation) {
+  if (
+    !navigator.geolocation
+  ) {
 
     hasil.className =
       "error";
 
+
     hasil.innerHTML =
       "❌ Browser tidak mendukung GPS.";
+
+
+    sudahScan = false;
+
 
     return;
 
@@ -761,11 +809,20 @@ function ambilGPSDanAbsen() {
 
     function(position) {
 
+
       const latitude =
         position.coords.latitude;
 
+
       const longitude =
         position.coords.longitude;
+
+
+      console.log(
+        "GPS:",
+        latitude,
+        longitude
+      );
 
 
       hasil.innerHTML =
@@ -774,22 +831,35 @@ function ambilGPSDanAbsen() {
         "⏳ Menyimpan absensi...";
 
 
-      // ==========================================
-      // KIRIM KE APPS SCRIPT
-      // ==========================================
+      // ==================================================
+      // KIRIM ABSENSI KE APPS SCRIPT
+      // ==================================================
 
       google.script.run
 
         .withSuccessHandler(
           function(result) {
 
+
+            console.log(
+              "HASIL ABSENSI:",
+              result
+            );
+
+
             if (
+              result &&
               result.sukses
             ) {
+
 
               hasil.className =
                 "success";
 
+
+              // ==============================
+              // ABSEN MASUK
+              // ==============================
 
               if (
                 result.tipe ===
@@ -812,6 +882,10 @@ function ambilGPSDanAbsen() {
 
               }
 
+
+              // ==============================
+              // ABSEN KELUAR
+              // ==============================
 
               else if (
                 result.tipe ===
@@ -845,9 +919,7 @@ function ambilGPSDanAbsen() {
               }
 
 
-              // ====================================
-              // RESET UNTUK SCAN BERIKUTNYA
-              // ====================================
+              // RELOAD 5 DETIK
 
               setTimeout(
                 function() {
@@ -868,7 +940,12 @@ function ambilGPSDanAbsen() {
 
               hasil.innerHTML =
                 "❌ " +
-                result.pesan;
+                (
+                  result &&
+                  result.pesan
+                    ? result.pesan
+                    : "Absensi gagal."
+                );
 
 
               sudahScan =
@@ -883,7 +960,9 @@ function ambilGPSDanAbsen() {
         .withFailureHandler(
           function(error) {
 
+
             console.error(
+              "ERROR ABSENSI:",
               error
             );
 
@@ -918,6 +997,7 @@ function ambilGPSDanAbsen() {
 
     function(error) {
 
+
       hasil.className =
         "error";
 
@@ -927,7 +1007,8 @@ function ambilGPSDanAbsen() {
       ) {
 
         hasil.innerHTML =
-          "❌ Izin lokasi ditolak.<br>" +
+          "❌ Izin lokasi ditolak." +
+          "<br>" +
           "Silakan izinkan GPS pada browser.";
 
       }
@@ -980,3 +1061,8 @@ function ambilGPSDanAbsen() {
   );
 
 }
+
+</script>
+
+</body>
+</html>
