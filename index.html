@@ -158,11 +158,11 @@ const TOKEN_PERUSAHAAN =
   "COMPANY-ABSEN";
 
 
-let sudahBerhasil =
-  false;
-
+let sudahBerhasil = false;
 
 let scanner = null;
+
+let cameraStream = null;
 
 
 // ==================================================
@@ -177,6 +177,30 @@ const hasil =
 // QR BERHASIL DIBACA
 // ==================================================
 
+  hasil.className =
+  "success";
+
+hasil.innerHTML =
+  "✅ <b>QR PERUSAHAAN VALID</b>" +
+  "<br><br>" +
+  "Token: " +
+  token;
+
+matikanKamera();
+
+  // Bersihkan video
+  const video =
+    document.querySelector(
+      "#reader video"
+    );
+
+  if (video) {
+
+    video.srcObject = null;
+
+  }
+
+}
 function onScanSuccess(
   decodedText,
   decodedResult
@@ -213,19 +237,13 @@ function onScanSuccess(
 
 
     hasil.className =
-      "success";
+  "success";
 
-
-    hasil.innerHTML =
-
-      "✅ <b>QR PERUSAHAAN VALID</b>" +
-
-      "<br><br>" +
-
-      "Token: " +
-
-      token;
-
+hasil.innerHTML =
+  "✅ <b>QR PERUSAHAAN VALID</b>" +
+  "<br><br>" +
+  "Token: " +
+  token;
 
     console.log(
       "QR perusahaan valid."
@@ -318,15 +336,15 @@ async function mulaiScanner() {
     // MINTA IZIN KAMERA
     // ==================================================
 
-    await navigator.mediaDevices
-      .getUserMedia({
+    cameraStream =
+  await navigator.mediaDevices
+    .getUserMedia({
 
-        video: true,
+      video: true,
 
-        audio: false
+      audio: false
 
-      });
-
+    });
 
     // ==================================================
     // AMBIL DAFTAR KAMERA
