@@ -792,21 +792,24 @@ function ambilGPSDanAbsen() {
               },
 
               body:
-                JSON.stringify({
+  JSON.stringify({
 
-                  aksi:
-                    "absensiMember",
+    aksi:
+      "absensiMember",
 
-                  memberToken:
-                    memberToken,
+    memberToken:
+      memberToken,
 
-                  latitude:
-                    latitude,
+    deviceId:
+      deviceId,
 
-                  longitude:
-                    longitude
+    latitude:
+      latitude,
 
-                })
+    longitude:
+      longitude
+
+  })
 
             }
           );
