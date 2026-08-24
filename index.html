@@ -368,19 +368,12 @@ async function daftarMember() {
           },
 
           body:
-            JSON.stringify({
-
-              aksi:
-                "registrasiMember",
-
-              id:
-                id,
-
-              nama:
-                nama
-
-            })
-
+  JSON.stringify({
+    aksi: "registrasiMember",
+    id: id,
+    nama: nama,
+    deviceId: deviceId
+  })
         }
       );
 
