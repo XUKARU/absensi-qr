@@ -227,6 +227,27 @@ let memberToken =
     "memberToken"
   );
 
+  // ==================================================
+// DEVICE ID
+// ==================================================
+
+let deviceId =
+  localStorage.getItem("deviceId");
+
+if (!deviceId) {
+
+  deviceId =
+    "DEV-" +
+    crypto.randomUUID()
+      .replace(/-/g, "")
+      .substring(0, 16)
+      .toUpperCase();
+
+  localStorage.setItem(
+    "deviceId",
+    deviceId
+  );
+}
 
 // ==================================================
 // SCANNER
