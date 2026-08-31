@@ -10,8 +10,10 @@
 
   <title>COMPANY ABSEN</title>
 
-  <script src="https://unpkg.com/html5-qrcode"
-          type="text/javascript"></script>
+  <script
+    src="https://unpkg.com/html5-qrcode"
+    type="text/javascript">
+  </script>
 
 
   <style>
@@ -69,7 +71,8 @@
     }
 
 
-    input {
+    input,
+    textarea {
 
       width: 100%;
 
@@ -83,6 +86,17 @@
       border-radius: 8px;
 
       font-size: 16px;
+
+      font-family: Arial, sans-serif;
+
+    }
+
+
+    textarea {
+
+      min-height: 100px;
+
+      resize: vertical;
 
     }
 
@@ -189,59 +203,66 @@
 
     .hidden {
 
-      display: none;
+      display: none !important;
 
     }
 
 
-    /* =====================================
-       PILIHAN ALASAN PULANG CEPAT
-       ===================================== */
+    /* ==========================================
+       FORM PULANG
+       ========================================== */
 
-    #pilihanAlasan {
-
-      display: none;
+    #formPulang {
 
       margin-top: 20px;
 
       padding: 18px;
 
       border:
-        2px solid #fbbc04;
+        1px solid #ddd;
 
       border-radius: 12px;
 
-      background: #fff8e1;
+      background: #fafafa;
 
       text-align: left;
 
     }
 
 
-    #pilihanAlasan h3 {
+    #formPulang h3 {
 
       margin-top: 0;
 
-      margin-bottom: 8px;
+      margin-bottom: 15px;
 
       text-align: center;
-
-      color: #b06000;
 
       font-size: 18px;
 
     }
 
 
-    #pesanPulang {
+    .judulInput {
 
-      text-align: center;
+      display: block;
+
+      margin-bottom: 7px;
+
+      font-weight: bold;
+
+      font-size: 15px;
+
+    }
+
+
+    /* ==========================================
+       PILIHAN ALASAN
+       ========================================== */
+
+    #bagianAlasan {
 
       margin-bottom: 15px;
-
-      font-size: 14px;
-
-      color: #555;
 
     }
 
@@ -256,7 +277,7 @@
 
       margin-bottom: 10px;
 
-      padding: 13px;
+      padding: 12px;
 
       border:
         1px solid #ddd;
@@ -267,14 +288,7 @@
 
       cursor: pointer;
 
-      font-size: 16px;
-
-    }
-
-
-    .radio-option:hover {
-
-      background: #f5f5f5;
+      font-size: 15px;
 
     }
 
@@ -290,37 +304,55 @@
     }
 
 
-    #btnKonfirmasi {
+    /* ==========================================
+       INPUT HASIL
+       ========================================== */
 
-      margin-top: 8px;
+    #hasilPulang {
+
+      min-height: 90px;
+
+      margin-bottom: 12px;
+
+    }
+
+
+    #btnKonfirmasiPulang {
 
       background: #188038;
 
+      margin-top: 5px;
+
     }
 
 
-    #btnBatal {
-
-      margin-top: 10px;
+    #btnBatalPulang {
 
       background: #d93025;
 
-    }
-
-
-    /* =====================================
-       TOMBOL RESET
-       ===================================== */
-
-    #btnScanLagi {
-
-      display: none;
-
-      margin-top: 15px;
-
-      background: #1a73e8;
+      margin-top: 10px;
 
     }
+
+
+    .info {
+
+      padding: 10px;
+
+      margin-bottom: 15px;
+
+      background: #fff8e1;
+
+      border-radius: 8px;
+
+      color: #795548;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+    }
+
 
   </style>
 
@@ -343,6 +375,7 @@
        ===================================== -->
 
   <div id="registrasi">
+
 
     <p>
       HP ini belum terdaftar sebagai Member.
@@ -375,6 +408,7 @@
 
     </button>
 
+
   </div>
 
 
@@ -399,16 +433,16 @@
     </div>
 
 
-    <!-- ===================================
+    <!-- =====================================
          SCANNER QR
-         =================================== -->
+         ===================================== -->
 
     <div id="reader"></div>
 
 
-    <!-- ===================================
-         HASIL
-         =================================== -->
+    <!-- =====================================
+         HASIL ABSENSI
+         ===================================== -->
 
     <div
       id="hasil"
@@ -425,74 +459,126 @@
     </p>
 
 
-    <!-- ===================================
-         PILIHAN ALASAN PULANG CEPAT
-         =================================== -->
+    <!-- =====================================
+         FORM PULANG
+         ===================================== -->
 
-    <div id="pilihanAlasan">
+    <div
+      id="formPulang"
+      class="hidden"
+    >
 
 
       <h3>
-        ⚠️ ALASAN PULANG CEPAT
+        📝 DATA ABSEN PULANG
       </h3>
 
 
-      <div id="pesanPulang">
+      <!-- =================================
+           INFORMASI
+           ================================= -->
 
-        Anda melakukan absensi sebelum jam
-        <b>15:30</b>.
+      <div
+        id="infoPulang"
+        class="info"
+      >
 
-        <br>
-
-        Silakan pilih alasan:
+        Silakan lengkapi data absensi pulang.
 
       </div>
 
 
-      <label class="radio-option">
+      <!-- =================================
+           ALASAN PULANG CEPAT
+           ================================= -->
 
-        <input
-          type="radio"
-          name="alasanPulang"
-          value="Sakit atau Izin"
-        >
+      <div
+        id="bagianAlasan"
+        class="hidden"
+      >
 
-        <span>
-          Sakit atau Izin
-        </span>
+        <label class="judulInput">
+
+          ⚠️ Alasan Pulang Cepat
+
+        </label>
+
+
+        <label class="radio-option">
+
+          <input
+            type="radio"
+            name="alasanPulang"
+            value="Sakit atau Izin"
+          >
+
+          <span>
+            Sakit atau Izin
+          </span>
+
+        </label>
+
+
+        <label class="radio-option">
+
+          <input
+            type="radio"
+            name="alasanPulang"
+            value="Setor Hasil"
+          >
+
+          <span>
+            Setor Hasil
+          </span>
+
+        </label>
+
+
+      </div>
+
+
+      <!-- =================================
+           INPUT HASIL
+           ================================= -->
+
+      <label
+        class="judulInput"
+        for="hasilPulang"
+      >
+
+        📦 Input Hasil
 
       </label>
 
 
-      <label class="radio-option">
+      <textarea
+        id="hasilPulang"
+        placeholder="Masukkan hasil pekerjaan..."
+      ></textarea>
 
-        <input
-          type="radio"
-          name="alasanPulang"
-          value="Setor Hasil"
-        >
 
-        <span>
-          Setor Hasil
-        </span>
-
-      </label>
-
+      <!-- =================================
+           KONFIRMASI
+           ================================= -->
 
       <button
         type="button"
-        id="btnKonfirmasi"
+        id="btnKonfirmasiPulang"
         onclick="konfirmasiPulang()"
       >
 
-        ✅ KONFIRMASI PULANG
+        ✅ KONFIRMASI ABSEN PULANG
 
       </button>
 
 
+      <!-- =================================
+           BATAL
+           ================================= -->
+
       <button
         type="button"
-        id="btnBatal"
+        id="btnBatalPulang"
         onclick="batalPulang()"
       >
 
@@ -504,22 +590,8 @@
     </div>
 
 
-    <!-- ===================================
-         SCAN LAGI
-         =================================== -->
-
-    <button
-      type="button"
-      id="btnScanLagi"
-      onclick="mulaiScanLagi()"
-    >
-
-      📷 SCAN LAGI
-
-    </button>
-
-
   </div>
+
 
 </div>
 
@@ -587,19 +659,16 @@ if (!deviceId) {
 
 let scanner = null;
 
-
-// ==================================================
-// STATUS SCAN
-// ==================================================
-
 let sudahScan = false;
 
 
 // ==================================================
-// STATUS MENUNGGU ALASAN
+// STATUS PULANG
 // ==================================================
 
-let sedangPulangCepat = false;
+let sedangPulang = false;
+
+let pulangCepat = false;
 
 
 // ==================================================
@@ -622,6 +691,7 @@ window.addEventListener(
 
 function cekMember() {
 
+
   if (memberToken) {
 
     tampilkanMember();
@@ -630,7 +700,8 @@ function cekMember() {
 
     document
       .getElementById("registrasi")
-      .classList.remove("hidden");
+      .classList
+      .remove("hidden");
 
   }
 
@@ -646,27 +717,21 @@ async function daftarMember() {
 
   const id =
     document
-      .getElementById(
-        "idKaryawan"
-      )
+      .getElementById("idKaryawan")
       .value
       .trim();
 
 
   const nama =
     document
-      .getElementById(
-        "namaKaryawan"
-      )
+      .getElementById("namaKaryawan")
       .value
       .trim();
 
 
   const tombol =
     document
-      .getElementById(
-        "btnDaftar"
-      );
+      .getElementById("btnDaftar");
 
 
   if (!id) {
@@ -691,9 +756,7 @@ async function daftarMember() {
   }
 
 
-  tombol.disabled =
-    true;
-
+  tombol.disabled = true;
 
   tombol.innerText =
     "MEMPROSES...";
@@ -843,12 +906,14 @@ function tampilkanMember() {
 
   document
     .getElementById("registrasi")
-    .classList.add("hidden");
+    .classList
+    .add("hidden");
 
 
   document
     .getElementById("member")
-    .classList.remove("hidden");
+    .classList
+    .remove("hidden");
 
 
   const nama =
@@ -858,9 +923,7 @@ function tampilkanMember() {
 
 
   document
-    .getElementById(
-      "namaMember"
-    )
+    .getElementById("namaMember")
     .innerText =
     nama || "Member";
 
@@ -878,16 +941,11 @@ async function mulaiScanner() {
 
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
+    document
+      .getElementById("hasil");
 
 
   try {
-
-
-    sudahScan =
-      false;
 
 
     hasil.className =
@@ -936,7 +994,7 @@ async function mulaiScanner() {
 
       function(errorMessage) {
 
-        // Abaikan error scan sementara
+        // Abaikan error scanner
 
       }
 
@@ -948,17 +1006,18 @@ async function mulaiScanner() {
 
 
     hasil.innerHTML =
+
       "📷 <b>Kamera belakang aktif</b>" +
+
       "<br><br>" +
+
       "Arahkan kamera ke QR perusahaan.";
 
 
   } catch (error) {
 
 
-    console.error(
-      error
-    );
+    console.error(error);
 
 
     hasil.className =
@@ -966,8 +1025,11 @@ async function mulaiScanner() {
 
 
     hasil.innerHTML =
+
       "❌ Kamera tidak dapat digunakan." +
+
       "<br><br>" +
+
       error.message;
 
   }
@@ -1014,9 +1076,8 @@ function onScanSuccess(
 
 
     const hasil =
-      document.getElementById(
-        "hasil"
-      );
+      document
+        .getElementById("hasil");
 
 
     hasil.className =
@@ -1041,9 +1102,8 @@ function onScanSuccess(
 
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
+    document
+      .getElementById("hasil");
 
 
   hasil.className =
@@ -1051,9 +1111,13 @@ function onScanSuccess(
 
 
   hasil.innerHTML =
+
     "✅ <b>QR PERUSAHAAN VALID</b>" +
+
     "<br><br>" +
+
     "Member: " +
+
     localStorage.getItem(
       "memberNama"
     );
@@ -1080,6 +1144,7 @@ function onScanSuccess(
 
           ambilGPSDanAbsen();
 
+
         }
       )
 
@@ -1087,9 +1152,7 @@ function onScanSuccess(
         function(error) {
 
 
-          console.log(
-            error
-          );
+          console.log(error);
 
 
           ambilGPSDanAbsen();
@@ -1099,7 +1162,6 @@ function onScanSuccess(
 
 
   } else {
-
 
     ambilGPSDanAbsen();
 
@@ -1116,9 +1178,8 @@ function ambilGPSDanAbsen() {
 
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
+    document
+      .getElementById("hasil");
 
 
   hasil.className =
@@ -1165,9 +1226,12 @@ function ambilGPSDanAbsen() {
 
 
       hasil.innerHTML =
+
         "📍 GPS berhasil." +
+
         "<br>" +
-        "⏳ Memproses absensi...";
+
+        "⏳ Memeriksa absensi...";
 
 
       try {
@@ -1203,7 +1267,13 @@ function ambilGPSDanAbsen() {
                     latitude,
 
                   longitude:
-                    longitude
+                    longitude,
+
+                  alasanPulang:
+                    "",
+
+                  hasilPulang:
+                    ""
 
                 })
 
@@ -1222,47 +1292,40 @@ function ambilGPSDanAbsen() {
 
 
         // ==========================================
-        // BUTUH ALASAN PULANG
+        // BUTUH DATA PULANG
         // ==========================================
 
         if (
           result &&
           result.tipe ===
-          "BUTUH_ALASAN_PULANG"
+            "BUTUH_DATA_PULANG"
         ) {
 
 
-          sedangPulangCepat =
-            true;
+          tampilkanFormPulang(
+            result.pulangCepat === true
+          );
 
 
-          hasil.className =
-            "error";
+          return;
+
+        }
 
 
-          hasil.innerHTML =
-            "⚠️ <b>PULANG CEPAT</b>" +
-            "<br><br>" +
-            "Silakan pilih alasan pulang.";
+        // ==========================================
+        // VERSI LAMA / BUTUH ALASAN
+        // ==========================================
+
+        if (
+          result &&
+          result.tipe ===
+            "BUTUH_ALASAN_PULANG"
+        ) {
 
 
-          document
-            .getElementById(
-              "pilihanAlasan"
-            )
-            .style.display =
-            "block";
-
-
-          // Simpan koordinat untuk
-          // konfirmasi berikutnya
-
-          window.latitudePulang =
-            latitude;
-
-
-          window.longitudePulang =
-            longitude;
+          tampilkanFormPulang(
+            true
+          );
 
 
           return;
@@ -1280,12 +1343,88 @@ function ambilGPSDanAbsen() {
         ) {
 
 
-          tampilkanHasilBerhasil(
-            result
+          hasil.className =
+            "success";
+
+
+          if (
+            result.tipe ===
+            "MASUK"
+          ) {
+
+
+            hasil.innerHTML =
+
+              "✅ <b>ABSEN MASUK BERHASIL</b>" +
+
+              "<br><br>" +
+
+              "Nama: " +
+
+              result.nama +
+
+              "<br>" +
+
+              "Waktu: " +
+
+              result.waktu;
+
+
+          }
+
+
+          else if (
+            result.tipe ===
+            "KELUAR"
+          ) {
+
+
+            hasil.innerHTML =
+
+              "✅ <b>ABSEN KELUAR BERHASIL</b>" +
+
+              "<br><br>" +
+
+              "Nama: " +
+
+              result.nama +
+
+              "<br>" +
+
+              "Waktu: " +
+
+              result.waktu +
+
+              "<br>" +
+
+              "Total: " +
+
+              (
+                result.totalJam ||
+                "-"
+              ) +
+
+              "<br>" +
+
+              "Status: " +
+
+              (
+                result.status ||
+                "-"
+              );
+
+          }
+
+
+          setTimeout(
+            function() {
+
+              location.reload();
+
+            },
+            5000
           );
 
-
-          return;
 
         }
 
@@ -1294,25 +1433,29 @@ function ambilGPSDanAbsen() {
         // GAGAL
         // ==========================================
 
-        hasil.className =
-          "error";
+        else {
 
 
-        hasil.innerHTML =
-          "❌ " +
-          (
-            result &&
-            result.pesan
-              ? result.pesan
-              : "Absensi gagal."
-          );
+          hasil.className =
+            "error";
 
 
-        sudahScan =
-          false;
+          hasil.innerHTML =
+
+            "❌ " +
+
+            (
+              result &&
+              result.pesan
+                ? result.pesan
+                : "Absensi gagal."
+            );
 
 
-        tampilkanTombolScanLagi();
+          sudahScan =
+            false;
+
+        }
 
 
       } catch(error) {
@@ -1329,14 +1472,12 @@ function ambilGPSDanAbsen() {
 
 
         hasil.innerHTML =
+
           "❌ Tidak dapat terhubung ke server absensi.";
 
 
         sudahScan =
           false;
-
-
-        tampilkanTombolScanLagi();
 
       }
 
@@ -1354,31 +1495,43 @@ function ambilGPSDanAbsen() {
         error.code === 1
       ) {
 
+
         hasil.innerHTML =
-          "❌ Izin lokasi ditolak.<br>" +
+
+          "❌ Izin lokasi ditolak." +
+
+          "<br>" +
+
           "Silakan izinkan GPS.";
 
       }
 
+
       else if (
         error.code === 2
       ) {
+
 
         hasil.innerHTML =
           "❌ Lokasi tidak tersedia.";
 
       }
 
+
       else if (
         error.code === 3
       ) {
 
+
         hasil.innerHTML =
+
           "❌ Pengambilan lokasi terlalu lama.";
 
       }
 
+
       else {
+
 
         hasil.innerHTML =
           "❌ GPS tidak dapat diperoleh.";
@@ -1388,9 +1541,6 @@ function ambilGPSDanAbsen() {
 
       sudahScan =
         false;
-
-
-      tampilkanTombolScanLagi();
 
     },
 
@@ -1414,37 +1564,161 @@ function ambilGPSDanAbsen() {
 
 
 // ==================================================
-// KONFIRMASI PULANG CEPAT
+// TAMPILKAN FORM PULANG
+// ==================================================
+
+function tampilkanFormPulang(
+  isPulangCepat
+) {
+
+
+  sedangPulang =
+    true;
+
+
+  pulangCepat =
+    isPulangCepat;
+
+
+  const form =
+    document
+      .getElementById(
+        "formPulang"
+      );
+
+
+  const bagianAlasan =
+    document
+      .getElementById(
+        "bagianAlasan"
+      );
+
+
+  const info =
+    document
+      .getElementById(
+        "infoPulang"
+      );
+
+
+  const hasil =
+    document
+      .getElementById(
+        "hasil"
+      );
+
+
+  form.classList.remove(
+    "hidden"
+  );
+
+
+  hasil.className =
+    "normal";
+
+
+  if (isPulangCepat) {
+
+
+    bagianAlasan
+      .classList
+      .remove("hidden");
+
+
+    info.innerHTML =
+
+      "⚠️ <b>Anda melakukan pulang cepat.</b>" +
+
+      "<br><br>" +
+
+      "Silakan pilih alasan pulang cepat " +
+
+      "dan isi hasil pekerjaan.";
+
+
+  } else {
+
+
+    bagianAlasan
+      .classList
+      .add("hidden");
+
+
+    info.innerHTML =
+
+      "ℹ️ <b>Absen pulang normal.</b>" +
+
+      "<br><br>" +
+
+      "Silakan isi hasil pekerjaan.";
+
+
+  }
+
+
+  document
+    .getElementById(
+      "hasilPulang"
+    )
+    .value = "";
+
+
+  document
+    .querySelectorAll(
+      'input[name="alasanPulang"]'
+    )
+    .forEach(
+      function(radio) {
+
+        radio.checked =
+          false;
+
+      }
+    );
+
+
+  document
+    .getElementById(
+      "hasilPulang"
+    )
+    .focus();
+
+}
+
+
+// ==================================================
+// KONFIRMASI PULANG
 // ==================================================
 
 async function konfirmasiPulang() {
 
 
-  const radio =
-    document.querySelector(
-      'input[name="alasanPulang"]:checked'
-    );
-
-
-  // ================================================
-  // WAJIB PILIH
-  // ================================================
-
-  if (!radio) {
-
-
-    const hasil =
-      document.getElementById(
-        "hasil"
+  const hasilInput =
+    document
+      .getElementById(
+        "hasilPulang"
       );
 
 
-    hasil.className =
-      "error";
+  const hasilPulang =
+    hasilInput.value.trim();
 
 
-    hasil.innerHTML =
-      "❌ Silakan pilih alasan pulang cepat terlebih dahulu.";
+  // ================================================
+  // HASIL WAJIB DIISI
+  // ================================================
+
+  if (!hasilPulang) {
+
+
+    tampilkanError(
+
+      "❌ Input hasil wajib diisi."
+
+    );
+
+
+    hasilInput.focus();
 
 
     return;
@@ -1452,19 +1726,54 @@ async function konfirmasiPulang() {
   }
 
 
-  const alasanPulang =
-    radio.value;
+  // ================================================
+  // ALASAN JIKA PULANG CEPAT
+  // ================================================
+
+  let alasanPulang = "";
+
+
+  if (pulangCepat) {
+
+
+    const radio =
+      document.querySelector(
+        'input[name="alasanPulang"]:checked'
+      );
+
+
+    if (!radio) {
+
+
+      tampilkanError(
+
+        "❌ Silakan pilih alasan pulang cepat terlebih dahulu."
+
+      );
+
+
+      return;
+
+    }
+
+
+    alasanPulang =
+      radio.value;
+
+  }
 
 
   // ================================================
-  // VALIDASI TOKEN
+  // DATA MEMBER
   // ================================================
 
   if (!memberToken) {
 
 
     tampilkanError(
+
       "❌ Member Token tidak ditemukan."
+
     );
 
 
@@ -1474,49 +1783,36 @@ async function konfirmasiPulang() {
 
 
   // ================================================
-  // VALIDASI GPS
+  // TOMBOL
   // ================================================
 
-  if (
-    window.latitudePulang === undefined ||
-    window.longitudePulang === undefined
-  ) {
+  const tombol =
+    document
+      .getElementById(
+        "btnKonfirmasiPulang"
+      );
 
 
-    tampilkanError(
-      "❌ Data GPS tidak tersedia. Silakan scan ulang."
-    );
+  const tombolBatal =
+    document
+      .getElementById(
+        "btnBatalPulang"
+      );
 
 
-    return;
-
-  }
-
-
-  const btnKonfirmasi =
-    document.getElementById(
-      "btnKonfirmasi"
-    );
-
-
-  const btnBatal =
-    document.getElementById(
-      "btnBatal"
-    );
-
-
-  btnKonfirmasi.disabled =
+  tombol.disabled =
     true;
 
 
-  btnBatal.disabled =
+  tombolBatal.disabled =
     true;
 
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
+    document
+      .getElementById(
+        "hasil"
+      );
 
 
   hasil.className =
@@ -1524,183 +1820,358 @@ async function konfirmasiPulang() {
 
 
   hasil.innerHTML =
+
     "⏳ Menyimpan absensi pulang...";
 
 
-  try {
+  // ================================================
+  // AMBIL GPS ULANG
+  // ================================================
+
+  if (
+    !navigator.geolocation
+  ) {
 
 
-    // ==============================================
-    // KIRIM ALASAN KE APPS SCRIPT
-    // ==============================================
+    tampilkanError(
 
-    const response =
-      await fetch(
-        API_URL,
-        {
+      "❌ Browser tidak mendukung GPS."
 
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":
-              "text/plain;charset=utf-8"
-
-          },
-
-          body:
-            JSON.stringify({
-
-              aksi:
-                "absensiMember",
-
-              memberToken:
-                memberToken,
-
-              deviceId:
-                deviceId,
-
-              latitude:
-                window.latitudePulang,
-
-              longitude:
-                window.longitudePulang,
-
-              alasanPulang:
-                alasanPulang
-
-            })
-
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    console.log(
-      "HASIL PULANG:",
-      result
     );
 
 
-    // ==============================================
-    // BERHASIL
-    // ==============================================
-
-    if (
-      result &&
-      result.sukses
-    ) {
+    tombol.disabled =
+      false;
 
 
-      sedangPulangCepat =
-        false;
+    tombolBatal.disabled =
+      false;
 
 
-      document
-        .getElementById(
-          "pilihanAlasan"
-        )
-        .style.display =
-        "none";
+    return;
+
+  }
 
 
-      tampilkanHasilBerhasil(
-        result,
-        alasanPulang
-      );
+  navigator.geolocation.getCurrentPosition(
+
+    async function(position) {
 
 
-      return;
+      const latitude =
+        position.coords.latitude;
 
-    }
+
+      const longitude =
+        position.coords.longitude;
 
 
-    // ==============================================
-    // MASIH MEMBUTUHKAN ALASAN
-    // ==============================================
+      try {
 
-    if (
-      result &&
-      result.tipe ===
-      "BUTUH_ALASAN_PULANG"
-    ) {
+
+        const response =
+          await fetch(
+            API_URL,
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  aksi:
+                    "absensiMember",
+
+                  memberToken:
+                    memberToken,
+
+                  deviceId:
+                    deviceId,
+
+                  latitude:
+                    latitude,
+
+                  longitude:
+                    longitude,
+
+                  alasanPulang:
+                    alasanPulang,
+
+                  hasilPulang:
+                    hasilPulang
+
+                })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        console.log(
+          "HASIL PULANG:",
+          result
+        );
+
+
+        // ==========================================
+        // BERHASIL
+        // ==========================================
+
+        if (
+          result &&
+          result.sukses
+        ) {
+
+
+          formPulangSelesai();
+
+
+          hasil.className =
+            "success";
+
+
+          hasil.innerHTML =
+
+            "✅ <b>ABSEN PULANG BERHASIL</b>" +
+
+            "<br><br>" +
+
+            "Nama: " +
+
+            (
+              result.nama ||
+              localStorage.getItem(
+                "memberNama"
+              )
+            ) +
+
+            "<br>" +
+
+            "Waktu: " +
+
+            (
+              result.waktu ||
+              "-"
+            ) +
+
+            "<br>" +
+
+            "Total: " +
+
+            (
+              result.totalJam ||
+              "-"
+            ) +
+
+            "<br>" +
+
+            "Status: " +
+
+            (
+              result.status ||
+              "-"
+            ) +
+
+            "<br><br>" +
+
+            "Hasil: " +
+
+            hasilPulang;
+
+
+          if (pulangCepat) {
+
+
+            hasil.innerHTML +=
+
+              "<br>" +
+
+              "Alasan: " +
+
+              alasanPulang;
+
+          }
+
+
+          setTimeout(
+            function() {
+
+              location.reload();
+
+            },
+            6000
+          );
+
+
+        }
+
+
+        // ==========================================
+        // GAGAL
+        // ==========================================
+
+        else {
+
+
+          hasil.className =
+            "error";
+
+
+          hasil.innerHTML =
+
+            "❌ " +
+
+            (
+              result &&
+              result.pesan
+                ? result.pesan
+                : "Absensi pulang gagal."
+            );
+
+
+          tombol.disabled =
+            false;
+
+
+          tombolBatal.disabled =
+            false;
+
+        }
+
+
+      } catch(error) {
+
+
+        console.error(
+          "ERROR SIMPAN PULANG:",
+          error
+        );
+
+
+        hasil.className =
+          "error";
+
+
+        hasil.innerHTML =
+
+          "❌ Tidak dapat terhubung ke server absensi.";
+
+
+        tombol.disabled =
+          false;
+
+
+        tombolBatal.disabled =
+          false;
+
+      }
+
+    },
+
+
+    function(error) {
 
 
       hasil.className =
         "error";
 
 
-      hasil.innerHTML =
-        "⚠️ Silakan pilih alasan pulang cepat.";
+      if (
+        error.code === 1
+      ) {
 
 
-      btnKonfirmasi.disabled =
+        hasil.innerHTML =
+
+          "❌ Izin GPS ditolak.";
+
+
+      } else if (
+        error.code === 2
+      ) {
+
+
+        hasil.innerHTML =
+
+          "❌ Lokasi GPS tidak tersedia.";
+
+
+      } else if (
+        error.code === 3
+      ) {
+
+
+        hasil.innerHTML =
+
+          "❌ Pengambilan GPS terlalu lama.";
+
+
+      } else {
+
+
+        hasil.innerHTML =
+
+          "❌ GPS tidak dapat diperoleh.";
+
+      }
+
+
+      tombol.disabled =
         false;
 
 
-      btnBatal.disabled =
+      tombolBatal.disabled =
         false;
 
+    },
 
-      return;
+
+    {
+
+      enableHighAccuracy:
+        true,
+
+      timeout:
+        15000,
+
+      maximumAge:
+        0
 
     }
 
+  );
 
-    // ==============================================
-    // GAGAL
-    // ==============================================
-
-    hasil.className =
-      "error";
+}
 
 
-    hasil.innerHTML =
-      "❌ " +
-      (
-        result &&
-        result.pesan
-          ? result.pesan
-          : "Absensi pulang gagal."
-      );
+// ==================================================
+// FORM PULANG SELESAI
+// ==================================================
+
+function formPulangSelesai() {
 
 
-    btnKonfirmasi.disabled =
-      false;
+  document
+    .getElementById(
+      "formPulang"
+    )
+    .classList
+    .add("hidden");
 
 
-    btnBatal.disabled =
-      false;
+  sedangPulang =
+    false;
 
-
-  } catch(error) {
-
-
-    console.error(
-      "ERROR KONFIRMASI PULANG:",
-      error
-    );
-
-
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ Tidak dapat terhubung ke server absensi.";
-
-
-    btnKonfirmasi.disabled =
-      false;
-
-
-    btnBatal.disabled =
-      false;
-
-  }
 
 }
 
@@ -1714,10 +2185,10 @@ function batalPulang() {
 
   document
     .getElementById(
-      "pilihanAlasan"
+      "formPulang"
     )
-    .style.display =
-    "none";
+    .classList
+    .add("hidden");
 
 
   document
@@ -1733,12 +2204,13 @@ function batalPulang() {
       "hasil"
     )
     .innerHTML =
+
     "ℹ️ Absensi pulang dibatalkan.";
 
 
   document
     .getElementById(
-      "btnKonfirmasi"
+      "btnKonfirmasiPulang"
     )
     .disabled =
     false;
@@ -1746,184 +2218,57 @@ function batalPulang() {
 
   document
     .getElementById(
-      "btnBatal"
+      "btnBatalPulang"
     )
     .disabled =
     false;
 
 
-  // Hapus pilihan radio
+  document
+    .getElementById(
+      "hasilPulang"
+    )
+    .value = "";
 
-  const radio =
-    document.querySelector(
-      'input[name="alasanPulang"]:checked'
+
+  document
+    .querySelectorAll(
+      'input[name="alasanPulang"]'
+    )
+    .forEach(
+      function(radio) {
+
+        radio.checked =
+          false;
+
+      }
     );
 
 
-  if (radio) {
-
-    radio.checked =
-      false;
-
-  }
-
-
-  sedangPulangCepat =
+  sedangPulang =
     false;
 
 
-  // Tetap jangan langsung membuka kamera.
-  // User harus menekan SCAN LAGI.
-
-  tampilkanTombolScanLagi();
-
-}
+  pulangCepat =
+    false;
 
 
-// ==================================================
-// TAMPILKAN HASIL BERHASIL
-// ==================================================
-
-function tampilkanHasilBerhasil(
-  result,
-  alasanPulang = ""
-) {
-
-
-  const hasil =
-    document.getElementById(
-      "hasil"
-    );
-
-
-  hasil.className =
-    "success";
-
-
-  let html = "";
-
-
-  if (
-    result.tipe ===
-    "MASUK"
-  ) {
-
-
-    html =
-
-      "✅ <b>ABSEN MASUK BERHASIL</b>" +
-
-      "<br><br>" +
-
-      "Nama: " +
-      (result.nama || "") +
-
-      "<br>" +
-
-      "Waktu: " +
-      (result.waktu || "");
-
-
-  }
-
-  else if (
-    result.tipe ===
-    "KELUAR"
-  ) {
-
-
-    html =
-
-      "✅ <b>ABSEN PULANG BERHASIL</b>" +
-
-      "<br><br>" +
-
-      "Nama: " +
-      (result.nama || "") +
-
-      "<br>" +
-
-      "Waktu: " +
-      (result.waktu || "");
-
-
-    if (
-      result.totalJam
-    ) {
-
-      html +=
-
-        "<br>" +
-
-        "Total: " +
-        result.totalJam;
-
-    }
-
-
-    if (
-      result.status
-    ) {
-
-      html +=
-
-        "<br>" +
-
-        "Status: " +
-        result.status;
-
-    }
-
-
-    if (
-      alasanPulang
-    ) {
-
-      html +=
-
-        "<br>" +
-
-        "Alasan: " +
-        alasanPulang;
-
-    }
-
-  }
-
-  else {
-
-
-    html =
-
-      "✅ <b>ABSENSI BERHASIL</b>" +
-
-      "<br><br>" +
-
-      "Nama: " +
-      (result.nama || "") +
-
-      "<br>" +
-
-      "Waktu: " +
-      (result.waktu || "");
-
-  }
-
-
-  hasil.innerHTML =
-    html;
-
+  // ================================================
+  // IZINKAN SCAN ULANG
+  // ================================================
 
   sudahScan =
-    true;
+    false;
 
 
-  document
-    .getElementById(
-      "btnScanLagi"
-    )
-    .style.display =
-    "block";
+  setTimeout(
+    function() {
+
+      mulaiScanner();
+
+    },
+    500
+  );
 
 }
 
@@ -1938,9 +2283,10 @@ function tampilkanError(
 
 
   const hasil =
-    document.getElementById(
-      "hasil"
-    );
+    document
+      .getElementById(
+        "hasil"
+      );
 
 
   hasil.className =
@@ -1954,114 +2300,8 @@ function tampilkanError(
 
 
 // ==================================================
-// TOMBOL SCAN LAGI
+// SELESAI
 // ==================================================
-
-function tampilkanTombolScanLagi() {
-
-
-  document
-    .getElementById(
-      "btnScanLagi"
-    )
-    .style.display =
-    "block";
-
-}
-
-
-// ==================================================
-// MULAI SCAN LAGI
-// ==================================================
-
-async function mulaiScanLagi() {
-
-
-  document
-    .getElementById(
-      "btnScanLagi"
-    )
-    .style.display =
-    "none";
-
-
-  document
-    .getElementById(
-      "hasil"
-    )
-    .className =
-    "normal";
-
-
-  document
-    .getElementById(
-      "hasil"
-    )
-    .innerHTML =
-    "📷 Menyiapkan kamera...";
-
-
-  // Reset status
-
-  sudahScan =
-    false;
-
-
-  sedangPulangCepat =
-    false;
-
-
-  window.latitudePulang =
-    undefined;
-
-
-  window.longitudePulang =
-    undefined;
-
-
-  // Reset radio
-
-  const radio =
-    document.querySelector(
-      'input[name="alasanPulang"]:checked'
-    );
-
-
-  if (radio) {
-
-    radio.checked =
-      false;
-
-  }
-
-
-  // Sembunyikan pilihan alasan
-
-  document
-    .getElementById(
-      "pilihanAlasan"
-    )
-    .style.display =
-    "none";
-
-
-  // Bersihkan reader
-
-  try {
-
-    document
-      .getElementById(
-        "reader"
-      )
-      .innerHTML =
-      "";
-
-  } catch(error) {}
-
-
-  await mulaiScanner();
-
-}
 
 </script>
 
