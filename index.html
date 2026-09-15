@@ -898,6 +898,8 @@ tampilkanDebugGPS(
     const result =
       await response.json();
 
+    console.log("RESPONS MASTER:", result);
+    alert(JSON.stringify(result, null, 2));
 
     console.log(
       "HASIL REGISTRASI:",
