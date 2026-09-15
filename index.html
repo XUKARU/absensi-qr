@@ -339,6 +339,25 @@
 
 <div class="container">
 
+<div
+  id="debugGPS"
+  style="
+    margin-bottom: 15px;
+    padding: 12px;
+    background: #fff8e1;
+    border: 1px solid #f0c36d;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.6;
+  "
+>
+  📍 <b>DEBUG GPS</b>
+  <br>
+  Status: Belum mengambil GPS
+</div>
+
+  
   <h2>
     📋 ABSENSI KARYAWAN
   </h2>
@@ -688,6 +707,41 @@ function cekMember() {
 }
 
 
+  // ==================================================
+// DEBUG GPS
+// ==================================================
+
+function tampilkanDebugGPS(
+  latitude,
+  longitude,
+  accuracy
+) {
+
+  const debug =
+    document.getElementById(
+      "debugGPS"
+    );
+
+  if (!debug) return;
+
+  debug.innerHTML =
+
+    "📍 <b>DEBUG GPS</b>" +
+
+    "<br>Latitude: " +
+    latitude +
+
+    "<br>Longitude: " +
+    longitude +
+
+    "<br>Akurasi: " +
+    accuracy +
+    " meter";
+
+}
+
+  
+
 // ==================================================
 // DAFTAR MEMBER
 // ==================================================
@@ -790,7 +844,12 @@ async function daftarMember() {
     const longitude =
       position.coords.longitude;
 
-
+tampilkanDebugGPS(
+  latitude,
+  longitude,
+  position.coords.accuracy
+);
+    
     tombol.innerText =
       "MEMPROSES...";
 
