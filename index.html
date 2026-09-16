@@ -1041,7 +1041,14 @@ async function mulaiScanner() {
 
 function onScanSuccess(decodedText) {
 
-  console.log("QR TERBACA:", decodedText);
+  if (sudahScan) {
+    return;
+  }
+
+  const token =
+    String(decodedText).trim();
+
+  console.log("QR LOKASI:", token);
 
   const hasil =
     document.getElementById("hasil");
@@ -1051,406 +1058,103 @@ function onScanSuccess(decodedText) {
     return;
   }
 
+  // ================================================
+  // VALIDASI QR
+  // ================================================
+
+  if (!token) {
+
+    hasil.className = "error";
+
+    hasil.innerHTML =
+      "❌ QR lokasi tidak valid.";
+
+    return;
+  }
+
+  // ================================================
+  // SIMPAN ID TEMPAT
+  // ================================================
+
+  idTempat = token;
+
+  sudahScan = true;
+
+  // ================================================
+  // UPDATE TOMBOL REGISTRASI
+  // ================================================
+
+  const tombol =
+    document.getElementById("btnDaftar");
+
+  if (tombol) {
+    tombol.innerText = "MEMPROSES...";
+  }
+
+  // ================================================
+  // TAMPILKAN QR BERHASIL
+  // ================================================
+
   hasil.className = "success";
 
   hasil.innerHTML =
-    "✅ <b>QR BERHASIL TERBACA</b>" +
+    "✅ <b>QR LOKASI VALID</b>" +
     "<br><br>" +
-    "Isi QR:" +
-    "<br>" +
-    "<b>" + escapeHtml(decodedText) + "</b>";
+    "Lokasi: " +
+    escapeHtml(idTempat);
 
-  alert(
-    "QR TERBACA!\n\nIsi QR:\n" +
-    decodedText
-  );
-}
+  // ================================================
+  // STOP KAMERA
+  // ================================================
 
-// ==================================================
-// GPS + REGISTRASI MEMBER
-// ==================================================
+  const lanjut = function() {
 
-function ambilGPSDanRegistrasi() {
+    try {
+      scanner.clear();
+    } catch (e) {}
 
-  const hasil =
-    document
-      .getElementById("hasil");
+    // ============================================
+    // MODE REGISTRASI
+    // ============================================
 
+    if (modeRegistrasi) {
 
-  hasil.className =
-    "normal";
+      ambilGPSDanRegistrasi();
 
-
-  hasil.innerHTML =
-    "📍 Mengambil lokasi GPS...";
-
-
-  if (
-    !navigator.geolocation
-  ) {
-
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ Browser tidak mendukung GPS.";
-
-
-    sudahScan =
-      false;
-
-    modeRegistrasi =
-      false;
-
-    const tombol =
-      document.getElementById(
-        "btnDaftar"
-      );
-
-
-    if (tombol) {
-
-      tombol.disabled =
-        false;
-
-      tombol.innerText =
-        "DAFTAR MEMBER";
-
+      return;
     }
 
+    // ============================================
+    // MODE ABSENSI
+    // ============================================
 
-    return;
+    ambilGPSDanAbsen();
+  };
 
-  }
+  if (scanner) {
 
+    scanner.stop()
 
-  navigator.geolocation.getCurrentPosition(
+      .then(lanjut)
 
-    async function(position) {
-
-      const latitude =
-        position.coords.latitude;
-
-
-      const longitude =
-        position.coords.longitude;
-
-
-      hasil.innerHTML =
-
-        "📍 GPS berhasil." +
-
-        "<br>" +
-
-        "⏳ Memproses registrasi...";
-
-
-      try {
-
-        const response =
-          await fetch(
-            API_URL,
-            {
-
-              method: "POST",
-
-              headers: {
-
-                "Content-Type":
-                  "text/plain;charset=utf-8"
-
-              },
-
-              body:
-                JSON.stringify({
-
-                  aksi:
-                    "registrasiMember",
-
-                  id:
-                    document
-                      .getElementById(
-                        "idKaryawan"
-                      )
-                      .value
-                      .trim(),
-
-                  nama:
-                    document
-                      .getElementById(
-                        "namaKaryawan"
-                      )
-                      .value
-                      .trim(),
-
-                  deviceId:
-                    deviceId,
-
-                  idTempat:
-                    idTempat,
-
-                  latitude:
-                    latitude,
-
-                  longitude:
-                    longitude
-
-                })
-
-            }
-          );
-
-
-        const result =
-          await response.json();
-
+      .catch(function(error) {
 
         console.log(
-          "HASIL REGISTRASI:",
-          result
-        );
-
-
-        // ==========================================
-        // REGISTRASI BERHASIL
-        // ==========================================
-
-        if (
-          result &&
-          result.sukses
-        ) {
-
-          localStorage.setItem(
-            "memberToken",
-            result.memberToken
-          );
-
-
-          localStorage.setItem(
-            "memberNama",
-            result.nama
-          );
-
-
-          localStorage.setItem(
-            "memberID",
-            result.id
-          );
-
-
-          memberToken =
-            result.memberToken;
-
-
-          modeRegistrasi =
-            false;
-
-
-          alert(
-            "✅ " +
-            result.pesan
-          );
-
-
-          tampilkanMember();
-
-
-          return;
-
-        }
-
-
-        // ==========================================
-        // REGISTRASI GAGAL
-        // ==========================================
-
-        hasil.className =
-          "error";
-
-
-        hasil.innerHTML =
-
-          "❌ " +
-
-          (
-            result &&
-            result.pesan
-              ? result.pesan
-              : "Registrasi gagal."
-          );
-
-
-        sudahScan =
-          false;
-
-
-        modeRegistrasi =
-          false;
-
-
-        const tombol =
-          document
-            .getElementById(
-              "btnDaftar"
-            );
-
-
-        if (tombol) {
-
-          tombol.disabled =
-            false;
-
-          tombol.innerText =
-            "DAFTAR MEMBER";
-
-        }
-
-      }
-
-
-      catch(error) {
-
-        console.error(
-          "ERROR REGISTRASI:",
+          "Gagal stop scanner:",
           error
         );
 
+        lanjut();
 
-        hasil.className =
-          "error";
+      });
 
+  } else {
 
-        hasil.innerHTML =
+    lanjut();
 
-          "❌ Tidak dapat terhubung ke server absensi.";
-
-
-        sudahScan =
-          false;
-
-
-        modeRegistrasi =
-          false;
-
-
-        const tombol =
-          document
-            .getElementById(
-              "btnDaftar"
-            );
-
-
-        if (tombol) {
-
-          tombol.disabled =
-            false;
-
-          tombol.innerText =
-            "DAFTAR MEMBER";
-
-        }
-
-      }
-
-    },
-
-
-    function(error) {
-
-      console.error(
-        "ERROR GPS REGISTRASI:",
-        error
-      );
-
-
-      if (
-        error &&
-        error.code === 1
-      ) {
-
-        hasil.innerHTML =
-          "❌ Izin lokasi ditolak.";
-
-      }
-
-      else if (
-        error &&
-        error.code === 2
-      ) {
-
-        hasil.innerHTML =
-          "❌ Lokasi tidak tersedia.";
-
-      }
-
-      else if (
-        error &&
-        error.code === 3
-      ) {
-
-        hasil.innerHTML =
-          "❌ Pengambilan lokasi terlalu lama.";
-
-      }
-
-      else {
-
-        hasil.innerHTML =
-          "❌ GPS tidak dapat diperoleh.";
-
-      }
-
-
-      hasil.className =
-        "error";
-
-
-      sudahScan =
-        false;
-
-
-      modeRegistrasi =
-        false;
-
-
-      const tombol =
-        document
-          .getElementById(
-            "btnDaftar"
-          );
-
-
-      if (tombol) {
-
-        tombol.disabled =
-          false;
-
-        tombol.innerText =
-          "DAFTAR MEMBER";
-
-      }
-
-    },
-
-
-    {
-
-      enableHighAccuracy:
-        true,
-
-      timeout:
-        15000,
-
-      maximumAge:
-        0
-
-    }
-
-  );
+  }
 
 }
-
 
 // ==================================================
 // GPS + ABSENSI
