@@ -12,7 +12,10 @@
   <title>COMPANY ABSEN</title>
 
   <script
-    src="https://unpkg.com/html5-qrcode"// ==================================================
+    src="https://unpkg.com/html5-qrcode" 
+
+    
+// ==================================================
 // QR TERBACA
 // ==================================================
 
@@ -1465,7 +1468,292 @@ function onScanSuccess(
 
   }
 
-}// ==================================================
+}
+  
+  
+// ==================================================
+// GPS + REGISTRASI MEMBER
+// ==================================================
+
+function ambilGPSDanRegistrasi() {
+
+  const hasil =
+    document
+      .getElementById("hasil");
+
+  hasil.className =
+    "normal";
+
+  hasil.innerHTML =
+    "📍 Mengambil lokasi GPS...";
+
+  if (
+    !navigator.geolocation
+  ) {
+
+    hasil.className =
+      "error";
+
+    hasil.innerHTML =
+      "❌ Browser tidak mendukung GPS.";
+
+    sudahScan =
+      false;
+
+    modeRegistrasi =
+      false;
+
+    return;
+
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    async function(position) {
+
+      const latitude =
+        position.coords.latitude;
+
+      const longitude =
+        position.coords.longitude;
+
+      hasil.innerHTML =
+
+        "📍 GPS berhasil." +
+
+        "<br>" +
+
+        "⏳ Memproses registrasi...";
+
+      try {
+
+        const response =
+          await fetch(
+            API_URL,
+            {
+
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "text/plain;charset=utf-8"
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  aksi:
+                    "registrasiMember",
+
+                  id:
+                    document
+                      .getElementById(
+                        "idKaryawan"
+                      )
+                      .value
+                      .trim(),
+
+                  nama:
+                    document
+                      .getElementById(
+                        "namaKaryawan"
+                      )
+                      .value
+                      .trim(),
+
+                  deviceId:
+                    deviceId,
+
+                  idTempat:
+                    idTempat,
+
+                  latitude:
+                    latitude,
+
+                  longitude:
+                    longitude
+
+                })
+
+            }
+          );
+
+        const result =
+          await response.json();
+
+        console.log(
+          "HASIL REGISTRASI:",
+          result
+        );
+
+        // ==========================================
+        // REGISTRASI BERHASIL
+        // ==========================================
+
+        if (
+          result &&
+          result.sukses
+        ) {
+
+          localStorage.setItem(
+            "memberToken",
+            result.memberToken
+          );
+
+          localStorage.setItem(
+            "memberNama",
+            result.nama
+          );
+
+          localStorage.setItem(
+            "memberID",
+            result.id
+          );
+
+          memberToken =
+            result.memberToken;
+
+          modeRegistrasi =
+            false;
+
+          alert(
+            "✅ " +
+            result.pesan
+          );
+
+          tampilkanMember();
+
+          return;
+
+        }
+
+        // ==========================================
+        // REGISTRASI GAGAL
+        // ==========================================
+
+        hasil.className =
+          "error";
+
+        hasil.innerHTML =
+
+          "❌ " +
+
+          (
+            result &&
+            result.pesan
+              ? result.pesan
+              : "Registrasi gagal."
+          );
+
+        sudahScan =
+          false;
+
+        modeRegistrasi =
+          false;
+
+      }
+
+      catch(error) {
+
+        console.error(
+          "ERROR REGISTRASI:",
+          error
+        );
+
+        hasil.className =
+          "error";
+
+        hasil.innerHTML =
+
+          "❌ Tidak dapat terhubung ke server absensi.";
+
+        sudahScan =
+          false;
+
+        modeRegistrasi =
+          false;
+
+      }
+
+    },
+
+    function(error) {
+
+      console.error(
+        "ERROR GPS REGISTRASI:",
+        error
+      );
+
+      if (
+        error &&
+        error.code === 1
+      ) {
+
+        hasil.innerHTML =
+          "❌ Izin lokasi ditolak.";
+
+      }
+
+      else if (
+        error &&
+        error.code === 2
+      ) {
+
+        hasil.innerHTML =
+          "❌ Lokasi tidak tersedia.";
+
+      }
+
+      else if (
+        error &&
+        error.code === 3
+      ) {
+
+        hasil.innerHTML =
+          "❌ Pengambilan lokasi terlalu lama.";
+
+      }
+
+      else {
+
+        hasil.innerHTML =
+          "❌ GPS tidak dapat diperoleh.";
+
+      }
+
+      hasil.className =
+        "error";
+
+      sudahScan =
+        false;
+
+      modeRegistrasi =
+        false;
+
+    },
+
+    {
+
+      enableHighAccuracy:
+        true,
+
+      timeout:
+        15000,
+
+      maximumAge:
+        0
+
+    }
+
+  );
+
+} 
+  
+  
+  
+// ==================================================
 // GPS + ABSENSI
 // ==================================================
 
