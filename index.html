@@ -660,6 +660,7 @@ if (!deviceId) {
 let scanner = null;
 
 let sudahScan = false;
+let idTempat = "";
 
 
 // ==================================================
@@ -1217,10 +1218,123 @@ function onScanSuccess(
 
 
   console.log(
-    "QR:",
+    "QR LOKASI:",
     token
   );
 
+
+  // ================================================
+  // VALIDASI ID TEMPAT
+  // ================================================
+
+  if (!token) {
+
+    const hasil =
+      document
+        .getElementById("hasil");
+
+
+    hasil.className =
+      "error";
+
+
+    hasil.innerHTML =
+      "❌ QR lokasi tidak valid.";
+
+
+    return;
+
+  }
+
+
+  // ================================================
+  // SIMPAN ID TEMPAT
+  // ================================================
+
+  idTempat =
+    token;
+
+
+  sudahScan =
+    true;
+
+
+  const hasil =
+    document
+      .getElementById("hasil");
+
+
+  hasil.className =
+    "success";
+
+
+  hasil.innerHTML =
+
+    "✅ <b>QR LOKASI VALID</b>" +
+
+    "<br><br>" +
+
+    "Lokasi: " +
+
+    idTempat +
+
+    "<br><br>" +
+
+    "Member: " +
+
+    (
+      localStorage.getItem(
+        "memberNama"
+      ) ||
+      "Member"
+    );
+
+
+  // ================================================
+  // STOP KAMERA
+  // ================================================
+
+  if (scanner) {
+
+    scanner.stop()
+
+      .then(
+        function() {
+
+          try {
+
+            scanner.clear();
+
+          } catch (e) {}
+
+
+          ambilGPSDanAbsen();
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          console.log(
+            "Gagal stop scanner:",
+            error
+          );
+
+
+          ambilGPSDanAbsen();
+
+        }
+      );
+
+
+  } else {
+
+    ambilGPSDanAbsen();
+
+  }
+
+}
 
   // ================================================
   // QR SALAH
@@ -1406,39 +1520,34 @@ function ambilGPSDanAbsen() {
 
               },
 
-              body:
-                JSON.stringify({
+             body:
+  JSON.stringify({
 
-                  aksi:
-                    "absensiMember",
+    aksi:
+      "absensiMember",
 
-                  memberToken:
-                    memberToken,
+    memberToken:
+      memberToken,
 
-                  deviceId:
-                    deviceId,
+    deviceId:
+      deviceId,
 
-                  latitude:
-                    latitude,
+    idTempat:
+      idTempat,
 
-                  longitude:
-                    longitude,
+    latitude:
+      latitude,
 
-                  // =================================
-                  // ABSEN MASUK
-                  // =================================
+    longitude:
+      longitude,
 
-                  alasanPulang:
-                    "",
+    alasanPulang:
+      "",
 
-                  hasil:
-                    ""
+    hasil:
+      ""
 
-                })
-
-            }
-          );
-
+  })
 
         const result =
           await response.json();
