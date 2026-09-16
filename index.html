@@ -12,7 +12,140 @@
   <title>COMPANY ABSEN</title>
 
   <script
-    src="https://unpkg.com/html5-qrcode"
+    src="https://unpkg.com/html5-qrcode"// ==================================================
+// QR TERBACA
+// ==================================================
+
+function onScanSuccess(
+  decodedText
+) {
+
+  if (sudahScan) {
+
+    return;
+
+  }
+
+  const token =
+    String(
+      decodedText
+    ).trim();
+
+  console.log(
+    "QR LOKASI:",
+    token
+  );
+
+  // ================================================
+  // VALIDASI QR
+  // ================================================
+
+  if (!token) {
+
+    const hasil =
+      document
+        .getElementById("hasil");
+
+    hasil.className =
+      "error";
+
+    hasil.innerHTML =
+      "❌ QR lokasi tidak valid.";
+
+    return;
+
+  }
+
+  // ================================================
+  // SIMPAN ID TEMPAT
+  // ================================================
+
+  idTempat =
+    token;
+
+  sudahScan =
+    true;
+
+  const hasil =
+    document
+      .getElementById("hasil");
+
+  hasil.className =
+    "success";
+
+  hasil.innerHTML =
+
+    "✅ <b>QR LOKASI VALID</b>" +
+
+    "<br><br>" +
+
+    "Lokasi: " +
+    idTempat;
+
+  // ================================================
+  // STOP KAMERA
+  // ================================================
+
+  const lanjut =
+    function() {
+
+      try {
+
+        scanner.clear();
+
+      } catch (e) {}
+
+      // ============================================
+      // MODE REGISTRASI
+      // ============================================
+
+      if (
+        modeRegistrasi
+      ) {
+
+        ambilGPSDanRegistrasi();
+
+        return;
+
+      }
+
+      // ============================================
+      // MODE ABSENSI
+      // ============================================
+
+      ambilGPSDanAbsen();
+
+    };
+
+
+  if (scanner) {
+
+    scanner.stop()
+
+      .then(
+        lanjut
+      )
+
+      .catch(
+        function(error) {
+
+          console.log(
+            "Gagal stop scanner:",
+            error
+          );
+
+          lanjut();
+
+        }
+      );
+
+  } else {
+
+    lanjut();
+
+  }
+
+}
     type="text/javascript">
   </script>
 
@@ -1213,21 +1346,18 @@ function onScanSuccess(
 
   }
 
-
   const token =
     String(
       decodedText
     ).trim();
-
 
   console.log(
     "QR LOKASI:",
     token
   );
 
-
   // ================================================
-  // VALIDASI ID TEMPAT
+  // VALIDASI QR
   // ================================================
 
   if (!token) {
@@ -1236,19 +1366,15 @@ function onScanSuccess(
       document
         .getElementById("hasil");
 
-
     hasil.className =
       "error";
-
 
     hasil.innerHTML =
       "❌ QR lokasi tidak valid.";
 
-
     return;
 
   }
-
 
   // ================================================
   // SIMPAN ID TEMPAT
@@ -1257,19 +1383,15 @@ function onScanSuccess(
   idTempat =
     token;
 
-
   sudahScan =
     true;
-
 
   const hasil =
     document
       .getElementById("hasil");
 
-
   hasil.className =
     "success";
-
 
   hasil.innerHTML =
 
@@ -1278,42 +1400,50 @@ function onScanSuccess(
     "<br><br>" +
 
     "Lokasi: " +
-
-    idTempat +
-
-    "<br><br>" +
-
-    "Member: " +
-
-    (
-      localStorage.getItem(
-        "memberNama"
-      ) ||
-      "Member"
-    );
-
+    idTempat;
 
   // ================================================
   // STOP KAMERA
   // ================================================
+
+  const lanjut =
+    function() {
+
+      try {
+
+        scanner.clear();
+
+      } catch (e) {}
+
+      // ============================================
+      // MODE REGISTRASI
+      // ============================================
+
+      if (
+        modeRegistrasi
+      ) {
+
+        ambilGPSDanRegistrasi();
+
+        return;
+
+      }
+
+      // ============================================
+      // MODE ABSENSI
+      // ============================================
+
+      ambilGPSDanAbsen();
+
+    };
+
 
   if (scanner) {
 
     scanner.stop()
 
       .then(
-        function() {
-
-          try {
-
-            scanner.clear();
-
-          } catch (e) {}
-
-
-          ambilGPSDanAbsen();
-
-        }
+        lanjut
       )
 
       .catch(
@@ -1324,129 +1454,18 @@ function onScanSuccess(
             error
           );
 
-
-          ambilGPSDanAbsen();
-
-        }
-      );
-
-
-  } else {
-
-    ambilGPSDanAbsen();
-
-  }
-
-}
-
-  // ================================================
-  // QR SALAH
-  // ================================================
-
-  if (
-    token !==
-    TOKEN_PERUSAHAAN
-  ) {
-
-    const hasil =
-      document
-        .getElementById("hasil");
-
-
-    hasil.className =
-      "error";
-
-
-    hasil.innerHTML =
-      "❌ QR bukan QR perusahaan.";
-
-
-    return;
-
-  }
-
-
-  // ================================================
-  // QR BENAR
-  // ================================================
-
-  sudahScan =
-    true;
-
-
-  const hasil =
-    document
-      .getElementById("hasil");
-
-
-  hasil.className =
-    "success";
-
-
-  hasil.innerHTML =
-
-    "✅ <b>QR PERUSAHAAN VALID</b>" +
-
-    "<br><br>" +
-
-    "Member: " +
-
-    (
-      localStorage.getItem(
-        "memberNama"
-      ) ||
-      "Member"
-    );
-
-
-  // ================================================
-  // STOP KAMERA
-  // ================================================
-
-  if (scanner) {
-
-    scanner.stop()
-
-      .then(
-        function() {
-
-          try {
-
-            scanner.clear();
-
-          } catch (e) {}
-
-
-          ambilGPSDanAbsen();
-
-        }
-      )
-
-      .catch(
-        function(error) {
-
-          console.log(
-            "Gagal stop scanner:",
-            error
-          );
-
-
-          ambilGPSDanAbsen();
+          lanjut();
 
         }
       );
 
-
   } else {
 
-    ambilGPSDanAbsen();
+    lanjut();
 
   }
 
-}
-
-
-// ==================================================
+}// ==================================================
 // GPS + ABSENSI
 // ==================================================
 
