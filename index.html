@@ -2063,9 +2063,15 @@ function tampilkanFormPulang(
     );
 
 
-  const hasil =
+  const hasilInput =
     document.getElementById(
-      "hasil"
+      "hasilPulang"
+    );
+
+
+  const tombolKonfirmasi =
+    document.getElementById(
+      "btnKonfirmasiPulang"
     );
 
 
@@ -2074,52 +2080,11 @@ function tampilkanFormPulang(
   );
 
 
-  hasil.className =
-    "normal";
+  // --------------------------------------------------
+  // RESET FORM
+  // --------------------------------------------------
 
-
-  if (isPulangCepat) {
-
-    bagianAlasan
-      .classList
-      .remove("hidden");
-
-
-    info.innerHTML =
-
-      "⚠️ <b>Anda melakukan pulang cepat.</b>" +
-
-      "<br><br>" +
-
-      "Silakan pilih alasan pulang cepat " +
-
-      "dan isi hasil pekerjaan.";
-
-  }
-
-  else {
-
-    bagianAlasan
-      .classList
-      .add("hidden");
-
-
-    info.innerHTML =
-
-      "ℹ️ <b>Absen pulang normal.</b>" +
-
-      "<br><br>" +
-
-      "Silakan isi hasil pekerjaan.";
-
-  }
-
-
-  document
-    .getElementById(
-      "hasilPulang"
-    )
-    .value = "";
+  hasilInput.value = "";
 
 
   document
@@ -2136,20 +2101,119 @@ function tampilkanFormPulang(
     );
 
 
-  document
-    .getElementById(
-      "hasilPulang"
-    )
-    .focus();
+  // --------------------------------------------------
+  // PULANG CEPAT
+  // --------------------------------------------------
+
+  if (isPulangCepat) {
+
+    bagianAlasan
+      .classList
+      .remove("hidden");
+
+
+    info.innerHTML =
+
+      "⚠️ <b>Anda melakukan pulang cepat.</b>" +
+
+      "<br><br>" +
+
+      "<b>Silakan pilih alasan pulang cepat terlebih dahulu.</b>" +
+
+      "<br><br>" +
+
+      "Setelah alasan dipilih, silakan isi hasil pekerjaan.";
+
+
+    // Input hasil tetap tersedia,
+    // tetapi fokus tidak langsung diarahkan ke sini.
+
+    hasilInput.disabled =
+      false;
+
+
+    tombolKonfirmasi.disabled =
+      false;
+
+  }
+
+  // --------------------------------------------------
+  // PULANG NORMAL
+  // --------------------------------------------------
+
+  else {
+
+    bagianAlasan
+      .classList
+      .add("hidden");
+
+
+    info.innerHTML =
+
+      "ℹ️ <b>Absen pulang normal.</b>" +
+
+      "<br><br>" +
+
+      "Silakan isi hasil pekerjaan.";
+
+
+    hasilInput.disabled =
+      false;
+
+
+    tombolKonfirmasi.disabled =
+      false;
+
+
+    hasilInput.focus();
+
+  }
 
 }
-
 
 // ==================================================
 // KONFIRMASI PULANG
 // ==================================================
 
 function konfirmasiPulang() {
+
+  let alasanPulang =
+    "";
+
+
+  // ==================================================
+  // 1. CEK ALASAN PULANG CEPAT TERLEBIH DAHULU
+  // ==================================================
+
+  if (pulangCepat) {
+
+    const radio =
+      document.querySelector(
+        'input[name="alasanPulang"]:checked'
+      );
+
+
+    if (!radio) {
+
+      alert(
+        "Silakan pilih alasan pulang cepat terlebih dahulu."
+      );
+
+
+      return;
+
+    }
+
+
+    alasanPulang =
+      radio.value;
+
+  }
+
+
+  // ==================================================
+  // 2. SETELAH ALASAN → CEK INPUT HASIL
+  // ==================================================
 
   const hasilInput =
     document.getElementById(
@@ -2166,7 +2230,7 @@ function konfirmasiPulang() {
   if (!hasil) {
 
     alert(
-      "Input hasil wajib diisi."
+      "Silakan isi hasil pekerjaan terlebih dahulu."
     );
 
 
@@ -2178,35 +2242,9 @@ function konfirmasiPulang() {
   }
 
 
-  let alasanPulang =
-    "";
-
-
-  if (pulangCepat) {
-
-    const radio =
-      document.querySelector(
-        'input[name="alasanPulang"]:checked'
-      );
-
-
-    if (!radio) {
-
-      alert(
-        "Silakan pilih alasan pulang cepat."
-      );
-
-
-      return;
-
-    }
-
-
-    alasanPulang =
-      radio.value;
-
-  }
-
+  // ==================================================
+  // 3. NONAKTIFKAN TOMBOL
+  // ==================================================
 
   const tombol =
     document.getElementById(
@@ -2228,6 +2266,10 @@ function konfirmasiPulang() {
     true;
 
 
+  // ==================================================
+  // 4. STATUS
+  // ==================================================
+
   const status =
     document.getElementById(
       "hasil"
@@ -2246,6 +2288,10 @@ function konfirmasiPulang() {
 
     "Mohon tunggu...";
 
+
+  // ==================================================
+  // 5. CEK GPS
+  // ==================================================
 
   if (!navigator.geolocation) {
 
@@ -2267,6 +2313,10 @@ function konfirmasiPulang() {
   }
 
 
+  // ==================================================
+  // 6. AMBIL GPS
+  // ==================================================
+
   navigator.geolocation.getCurrentPosition(
 
     function(position) {
@@ -2287,6 +2337,10 @@ function konfirmasiPulang() {
 
         "🔄 Menyimpan absensi pulang...";
 
+
+      // ==================================================
+      // 7. KIRIM KE MASTER
+      // ==================================================
 
       fetch(
 
@@ -2337,6 +2391,10 @@ function konfirmasiPulang() {
 
       )
 
+      // ==================================================
+      // 8. RESPONSE
+      // ==================================================
+
       .then(function(response) {
 
         return response.json();
@@ -2386,6 +2444,10 @@ function konfirmasiPulang() {
       })
 
 
+      // ==================================================
+      // 9. ERROR
+      // ==================================================
+
       .catch(function(error) {
 
         console.error(
@@ -2419,6 +2481,10 @@ function konfirmasiPulang() {
 
     },
 
+
+    // ==================================================
+    // ERROR GPS
+    // ==================================================
 
     function(error) {
 
