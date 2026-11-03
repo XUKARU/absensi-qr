@@ -676,18 +676,6 @@ if (!deviceId) {
 
 }
 
-
-console.log(
-  "MEMBER TOKEN:",
-  memberToken
-);
-
-console.log(
-  "DEVICE ID:",
-  deviceId
-);
-
-
 // ==================================================
 // SCANNER
 // ==================================================
@@ -1465,12 +1453,6 @@ function ambilGPSDanRegistrasi() {
       })
 
       .then(function(data) {
-
-        console.log(
-          "RESPON MASTER REGISTRASI:",
-          data
-        );
-
 
         if (
           data &&
@@ -2836,8 +2818,8 @@ function tampilkanError(
     "error";
 
 
-  hasil.innerHTML =
-    String(pesan);
+  hasil.textContent =
+  String(pesan);
 
 }
 
