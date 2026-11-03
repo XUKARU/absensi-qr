@@ -1810,7 +1810,7 @@ function ambilGPSDanAbsen() {
 
       })
 
-      .then(function(data) {
+            .then(function(data) {
 
         console.log(
           "RESPON MASTER ABSENSI:",
@@ -1824,8 +1824,7 @@ function ambilGPSDanAbsen() {
         ) {
 
           if (
-            data.tipe ===
-            "MASUK"
+            data.tipe === "MASUK"
           ) {
 
             tampilkanSuksesMasuk(
@@ -1841,29 +1840,29 @@ function ambilGPSDanAbsen() {
             data.tipe === "PULANG" ||
             data.tipe === "PULANG_CEPAT"
           ) {
-          
+
             tampilkanSuksesPulang(
               data
             );
-          
+
             return;
-          
+
           }
+
+        }
+
 
         if (
           data &&
-          data.tipe ===
-          "BUTUH_HASIL"
+          data.tipe === "BUTUH_HASIL"
         ) {
 
           tampilkanFormPulang(
             false
           );
 
-
           sudahScan =
             false;
-
 
           return;
 
@@ -1872,18 +1871,15 @@ function ambilGPSDanAbsen() {
 
         if (
           data &&
-          data.tipe ===
-          "BUTUH_ALASAN_PULANG"
+          data.tipe === "BUTUH_ALASAN_PULANG"
         ) {
 
           tampilkanFormPulang(
             true
           );
 
-
           sudahScan =
             false;
-
 
           return;
 
@@ -1903,7 +1899,7 @@ function ambilGPSDanAbsen() {
         sudahScan =
           false;
 
-      }
+      })
 
 
       .catch(function(error) {
@@ -1932,7 +1928,6 @@ function ambilGPSDanAbsen() {
           false;
 
       });
-
     },
 
 
