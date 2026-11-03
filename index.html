@@ -1838,20 +1838,17 @@ function ambilGPSDanAbsen() {
 
 
           if (
-            data.tipe ===
-            "PULANG"
+            data.tipe === "PULANG" ||
+            data.tipe === "PULANG_CEPAT"
           ) {
-
+          
             tampilkanSuksesPulang(
               data
             );
-
+          
             return;
-
+          
           }
-
-        }
-
 
         if (
           data &&
