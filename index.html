@@ -2439,17 +2439,9 @@ function konfirmasiPulang() {
 
 
         tampilkanError(
-
-          "❌ Gagal menghubungi MASTER." +
-
-          "<br><br>" +
-
-          escapeHtml(
-            error.message ||
-            String(error)
-          )
-
-        );
+        "❌ Gagal menghubungi MASTER. " +
+        (error.message || String(error))
+    );
 
 
         tombol.disabled =
