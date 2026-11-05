@@ -1853,21 +1853,28 @@ function ambilGPSDanAbsen() {
 
 
         if (
-          data &&
-          data.tipe === "BUTUH_HASIL"
-        ) {
-
-          tampilkanFormPulang(
-            false
-          );
-
-          sudahScan =
-            false;
-
-          return;
-
-        }
-
+            data &&
+            data.tipe === "BUTUH_HASIL"
+          ) {
+          
+            alert(
+              data.pesan ||
+              "Silakan isi hasil pekerjaan terlebih dahulu."
+            );
+          
+            const hasilInput =
+              document.getElementById(
+                "hasilPulang"
+              );
+          
+            hasilInput.focus();
+          
+            sudahScan =
+              false;
+          
+            return;
+          
+          }
 
         if (
           data &&
